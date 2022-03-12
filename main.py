@@ -5,6 +5,7 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 1200, 604
 BALL_SIZE = 27
 
 
+
 class Game:
     def __init__(self):
 
