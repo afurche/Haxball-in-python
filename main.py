@@ -60,6 +60,11 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._game_run = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_j:
+                    #Blit Janne Ahonen
+                    self._screen.blit(self._janne_ahonen, self._janne_ahonen.get_rect())
+                    pygame.display.update()
 
     def blit_players(self):
         for red_player, blue_player in zip(self._red_team, self._blue_team):
