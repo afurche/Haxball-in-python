@@ -2,7 +2,7 @@ import pygame
 
 
 def hello_world():
-    print("Hello World !!")
+    print("Hello World !!" + "Adam")
 
 
 if __name__ == '__main__':
