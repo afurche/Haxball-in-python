@@ -16,6 +16,8 @@ class Game:
         self._background_sprite = pygame.image.load(os.path.join('assets', 'haxmap.png'))
         self._janne_ahonen = pygame.image.load(os.path.join('assets', 'JanneAhonen.jpg'))
         self._ball_sprite = pygame.image.load(os.path.join('assets', 'ball.png'))
+        self._red_player_sprite = pygame.image.load(os.path.join('assets', 'red_player.png'))
+        self._blue_player_sprite = pygame.image.load(os.path.join('assets', 'blue_player.png'))
         self._clock = pygame.time.Clock()
 
     def event_catcher(self):
@@ -25,8 +27,14 @@ class Game:
 
     def blit_background(self):
         self._screen.blit(self._background_sprite, self._background_sprite.get_rect())
-        # self._screen.blit(self._janne_ahonen, self._janne_ahonen.get_rect())
         self._screen.blit(self._ball_sprite, (SCREEN_WIDTH / 2 - (BALL_SIZE / 2), SCREEN_HEIGHT / 2 - (BALL_SIZE / 2)))
+        self._screen.blit(self._red_player_sprite, (200, 280))
+        self._screen.blit(self._red_player_sprite, (200, 430))
+        self._screen.blit(self._red_player_sprite, (200, 130))
+
+        self._screen.blit(self._blue_player_sprite, (950, 280))
+        self._screen.blit(self._blue_player_sprite, (950, 430))
+        self._screen.blit(self._blue_player_sprite, (950, 130))
         pygame.display.update()
 
     def game_loop(self):
