@@ -1,9 +1,39 @@
 import pygame
+import os
+
+SCREEN_WIDTH, SCREEN_HEIGHT = 1200, 604
+BALL_SIZE = 27
 
 
-def hello_world():
-    print("Hello World !!" + "Adam" + "Konrad")
+class Game:
+    def __init__(self):
+
+        self._game_run = True
+
+        pygame.init()
+        self._screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption('Mini Football')
+        self._background_sprite = pygame.image.load(os.path.join('assets', 'haxmap.png'))
+        self._janne_ahonen = pygame.image.load(os.path.join('assets', 'JanneAhonen.jpg'))
+        self._ball_sprite = pygame.image.load(os.path.join('assets', 'ball.png'))
+        self._clock = pygame.time.Clock()
+
+    def event_catcher(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self._game_run = False
+
+    def blit_background(self):
+        self._screen.blit(self._background_sprite, self._background_sprite.get_rect())
+        # self._screen.blit(self._janne_ahonen, self._janne_ahonen.get_rect())
+        self._screen.blit(self._ball_sprite, (SCREEN_WIDTH / 2 - (BALL_SIZE / 2), SCREEN_HEIGHT / 2 - (BALL_SIZE / 2)))
+        pygame.display.update()
+
+    def game_loop(self):
+        while self._game_run:
+            self.blit_background()
+            self.event_catcher()
 
 
 if __name__ == '__main__':
-    hello_world()
+    Game().game_loop()
