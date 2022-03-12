@@ -24,8 +24,11 @@ class BallObject:
         return self._sprite
 
     def draw(self, screen):
-        pygame.draw.circle(screen, color='blue', center=self.coord, radius=self._radius)
+        pygame.draw.circle(screen, color='black', center=self.coord, radius=self._radius)
         screen.blit(self.sprite, tuple(coord - self._radius for coord in self.coord))
+
+    def move(self):
+        pass
 
 
 class TeamPlayer(BallObject):
@@ -51,9 +54,6 @@ class Game:
         self._red_team = [TeamPlayer(coord[0], coord[1], 'red') for coord in RED_TEAM_START_POSITIONS]
         self._blue_team = [TeamPlayer(coord[0], coord[1], 'blue') for coord in BLUE_TEAM_START_POSITIONS]
         self._janne_ahonen = pygame.image.load(os.path.join('assets', 'JanneAhonen.jpg'))
-        self._ball_sprite = pygame.image.load(os.path.join('assets', 'ball.png'))
-        self._red_player_sprite = pygame.image.load(os.path.join('assets', 'red_player.png'))
-        self._blue_player_sprite = pygame.image.load(os.path.join('assets', 'blue_player.png'))
         self._clock = pygame.time.Clock()
 
     def event_catcher(self):
