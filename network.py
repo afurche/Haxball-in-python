@@ -5,7 +5,7 @@ import pickle
 class Network:
     def __init__(self):
         self._client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._server = "192.168.0.123"
+        self._server = "192.168.76.132"
         self._port = 5556
         self._address = (self._server, self._port)
         self._football_pitch = self.connect()
@@ -18,7 +18,7 @@ class Network:
         try:
             self._client.connect(self._address)
             return pickle.loads(self._client.recv(2048))
-        except WindowsError as err:
+        except Exception as err:
             print(err)
 
     def send(self, data):
