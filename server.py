@@ -6,7 +6,7 @@ import pickle
 
 class Server:
     def __init__(self):
-        self._server = "192.168.76.132"
+        self._server = "192.168.0.123"
         self._port = 5556
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._current_client_id = 0

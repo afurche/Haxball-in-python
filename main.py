@@ -87,7 +87,7 @@ class Game:
                 self._game_run = False
 
     def blit_players(self):
-        for red_player, blue_player in zip(self._football_pitch.player1.team, self._football_pitch.player2.team):  # popraw
+        for red_player, blue_player in zip(self._football_pitch.player1.team, self._football_pitch.player2.team):
             red_player.draw(self._screen, self._red_team_sprite)
             blue_player.draw(self._screen, self._blue_team_sprite)
 
