@@ -17,11 +17,16 @@ class Server:
         self._football_pitch = FootballPitch()
 
     def client_thread(self, conn, client_id):
+        self._football_pitch.player_id = client_id + 1
         conn.send(pickle.dumps(self._football_pitch))
         while True:
             try:
                 data = pickle.loads(conn.recv(2048))
-                self._football_pitch = data
+                if client_id == 0:
+                    self._football_pitch.player1 = data.player1
+                    self._football_pitch.ball = data.ball
+                elif client_id == 1:
+                    self._football_pitch.player2 = data.player2
 
                 if not data:
                     print(f"Client{client_id} disconnected with server")
