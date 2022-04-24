@@ -8,6 +8,8 @@ GAME_BALL_SIZE = 27
 PLAYER_BALL_SIZE = 54
 RED_TEAM_START_POSITIONS = [(200, 130), (200, 280), (200, 430)]
 BLUE_TEAM_START_POSITIONS = [(950, 130), (950, 280), (950, 430)]
+STANDARD_VELOCITY = 7
+SPRINT_VELOCITY = 10
 
 
 class BallObject:
@@ -15,7 +17,8 @@ class BallObject:
         self._x = start_x
         self._y = start_y
         self._radius = ball_size / 2
-        self._velocity = 2
+        self._standard_velocity = STANDARD_VELOCITY
+        self._sprint_velocity = SPRINT_VELOCITY
 
     @property
     def coord(self):
@@ -24,21 +27,6 @@ class BallObject:
     def draw(self, screen, sprite):
         pygame.draw.circle(screen, color='black', center=self.coord, radius=self._radius)
         screen.blit(sprite, tuple(coord - self._radius for coord in self.coord))
-
-    def move(self):
-        keys = pygame.key.get_pressed()
-
-        if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._x > 30:
-            self._x -= self._velocity
-
-        if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and self._x < 1170:
-            self._x += self._velocity
-
-        if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._y > 30:
-            self._y -= self._velocity
-
-        if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self._y < 574:
-            self._y += self._velocity
 
     @property
     def x(self):
@@ -56,10 +44,53 @@ class BallObject:
     def y(self, move_val):
         self._y = move_val
 
+    @property
+    def standard_velocity(self):
+        return self._standard_velocity
+
+    @standard_velocity.setter
+    def standard_velocity(self, new_velocity):
+        self._standard_velocity = new_velocity
+
+    @property
+    def sprint_velocity(self):
+        return self._sprint_velocity
+
+    @sprint_velocity.setter
+    def sprint_velocity(self, new_velocity):
+        self._sprint_velocity = new_velocity
+
 
 class TeamPlayer(BallObject):
     def __init__(self, start_x, start_y):
         super().__init__(start_x, start_y, PLAYER_BALL_SIZE)
+
+    def move(self):
+        keys = pygame.key.get_pressed()
+
+        if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._x > 30:
+            if keys[pygame.K_LSHIFT]:
+                self._x -= self._sprint_velocity
+            else:
+                self._x -= self._standard_velocity
+
+        if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and self._x < 1170:
+            if keys[pygame.K_LSHIFT]:
+                self._x += self._sprint_velocity
+            else:
+                self._x += self._standard_velocity
+
+        if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._y > 30:
+            if keys[pygame.K_LSHIFT]:
+                self._y -= self._sprint_velocity
+            else:
+                self._y -= self._standard_velocity
+
+        if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self._y < 574:
+            if keys[pygame.K_LSHIFT]:
+                self._y += self._sprint_velocity
+            else:
+                self._y += self._standard_velocity
 
 
 class GameBall(BallObject):
@@ -67,7 +98,7 @@ class GameBall(BallObject):
         super().__init__(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, GAME_BALL_SIZE)
 
     def move_automatic(self):
-        self.y = (self.y + 1) % 604
+        self.y = (self.y + self._standard_velocity) % 604
 
 
 class Player:
