@@ -64,6 +64,7 @@ class BallObject:
 class TeamPlayer(BallObject):
     def __init__(self, start_x, start_y):
         super().__init__(start_x, start_y, PLAYER_BALL_SIZE)
+        self._is_current = False
 
     def move(self):
         keys = pygame.key.get_pressed()
@@ -91,6 +92,14 @@ class TeamPlayer(BallObject):
                 self._y += self._sprint_velocity
             else:
                 self._y += self._standard_velocity
+
+    @property
+    def is_current(self):
+        return self._is_current
+
+    @is_current.setter
+    def is_current(self, new_is_current):
+        self._is_current = new_is_current
 
 
 class GameBall(BallObject):
@@ -121,6 +130,8 @@ class FootballPitch:
         self._player1 = Player(RED_TEAM_START_POSITIONS)
         self._player2 = Player(BLUE_TEAM_START_POSITIONS)
         self._ball = GameBall()
+        self._player1.team[0].is_current = True
+        self._player2.team[0].is_current = True
 
     @property
     def player1(self):
@@ -166,6 +177,7 @@ class Game:
         self._background_sprite = pygame.image.load(os.path.join('assets', 'haxmap.png'))
         self._red_team_sprite = pygame.image.load(os.path.join('assets', 'red_player.png'))
         self._blue_team_sprite = pygame.image.load(os.path.join('assets', 'blue_player.png'))
+        self._red_team_current_sprite = pygame.image.load(os.path.join('assets', 'red_player_current.png'))
         self._ball_sprite = pygame.image.load(os.path.join('assets', 'ball.png'))
         self._clock = pygame.time.Clock()
         self._game_run = True
@@ -179,8 +191,18 @@ class Game:
 
     def blit_players(self):
         for red_player, blue_player in zip(self._football_pitch.player1.team, self._football_pitch.player2.team):
-            red_player.draw(self._screen, self._red_team_sprite)
-            blue_player.draw(self._screen, self._blue_team_sprite)
+            if self._football_pitch.player_id == 1:
+                if red_player.is_current:
+                    red_player.draw(self._screen, self._red_team_current_sprite)
+                else:
+                    red_player.draw(self._screen, self._red_team_sprite)
+                blue_player.draw(self._screen, self._blue_team_sprite)
+            elif self._football_pitch.player_id == 2:
+                if blue_player.is_current:
+                    blue_player.draw(self._screen, self._red_team_current_sprite)
+                else:
+                    blue_player.draw(self._screen, self._blue_team_sprite)
+                red_player.draw(self._screen, self._red_team_sprite)
 
     def blit_screen(self):
         self._screen.blit(self._background_sprite, self._background_sprite.get_rect())
