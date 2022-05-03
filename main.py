@@ -2,6 +2,7 @@ import pygame
 import os
 from network import Network
 import pickle
+from math import sqrt, cos, sin
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 1200, 604
 GAME_BALL_SIZE = 27
@@ -105,23 +106,39 @@ class TeamPlayer(BallObject):
 class GameBall(BallObject):
     def __init__(self):
         super().__init__(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, GAME_BALL_SIZE)
+        self._angle = 0
 
     def move_automatic(self):
-        self.y = (self.y + self._standard_velocity) % 604
+        self.y = int(cos(self._angle) * 100) + SCREEN_HEIGHT / 2
+        self.x = int(sin(self._angle) * 100) + SCREEN_WIDTH / 2
+        self._angle += 0.05
 
 
 class Player:
     def __init__(self, team_start_position):
         self._team = [TeamPlayer(coord[0], coord[1]) for coord in team_start_position]
-
-    # here we have to implement moving, changing characters and bot movement
+        self._team[0].is_current = True
 
     def move_footballer(self):
-        self._team[0].move()
+        for player in self._team:
+            if player.is_current:
+                player.move()
 
     @property
     def team(self):
         return self._team
+
+    @property
+    def current_player(self):
+        for player in self._team:
+            if player.is_current:
+                return player
+
+    def change_to_player_closest_to_ball(self, ball_coord: (int, int)) -> None:
+        distance_dict = {index: sqrt(abs(ball_coord[0] - player.coord[0]) ** 2 + abs(ball_coord[1] - player.coord[1]) ** 2) for index, player in enumerate(self._team)}
+        min_distance_player_index = min(distance_dict, key=lambda k: distance_dict.get(k))
+        self.current_player.is_current = False
+        self._team[min_distance_player_index].is_current = True
 
 
 class FootballPitch:
@@ -130,8 +147,6 @@ class FootballPitch:
         self._player1 = Player(RED_TEAM_START_POSITIONS)
         self._player2 = Player(BLUE_TEAM_START_POSITIONS)
         self._ball = GameBall()
-        self._player1.team[0].is_current = True
-        self._player2.team[0].is_current = True
 
     @property
     def player1(self):
@@ -168,6 +183,12 @@ class FootballPitch:
     def ball(self, ball):
         self._ball = ball
 
+    def player_footballer_change(self):
+        if self._player_id == 1:
+            self._player1.change_to_player_closest_to_ball(self._ball.coord)
+        elif self._player_id == 2:
+            self._player2.change_to_player_closest_to_ball(self._ball.coord)
+
 
 class Game:
     def __init__(self):
@@ -181,13 +202,23 @@ class Game:
         self._ball_sprite = pygame.image.load(os.path.join('assets', 'ball.png'))
         self._clock = pygame.time.Clock()
         self._game_run = True
+        self._is_player_changing_footballer = False
         self._network = Network()
         self._football_pitch = self._network.football_pitch
+
+    def player_change_event(self):
+        if self._is_player_changing_footballer:
+            self._football_pitch.player_footballer_change()
+            self._is_player_changing_footballer = False
 
     def event_catcher(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._game_run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e:
+                    if not self._is_player_changing_footballer:
+                        self._is_player_changing_footballer = True
 
     def blit_players(self):
         for red_player, blue_player in zip(self._football_pitch.player1.team, self._football_pitch.player2.team):
@@ -232,6 +263,7 @@ class Game:
             self.blit_screen()
             self.event_catcher()
             self.player_move()
+            self.player_change_event()
             self._football_pitch.ball.move_automatic()
 
 
