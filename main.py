@@ -199,6 +199,7 @@ class Game:
         self._red_team_sprite = pygame.image.load(os.path.join('assets', 'red_player.png'))
         self._blue_team_sprite = pygame.image.load(os.path.join('assets', 'blue_player.png'))
         self._red_team_current_sprite = pygame.image.load(os.path.join('assets', 'red_player_current.png'))
+        self._blue_team_current_sprite = pygame.image.load(os.path.join('assets', 'blue_player_current.png'))
         self._ball_sprite = pygame.image.load(os.path.join('assets', 'ball.png'))
         self._clock = pygame.time.Clock()
         self._game_run = True
@@ -230,7 +231,7 @@ class Game:
                 blue_player.draw(self._screen, self._blue_team_sprite)
             elif self._football_pitch.player_id == 2:
                 if blue_player.is_current:
-                    blue_player.draw(self._screen, self._red_team_current_sprite)
+                    blue_player.draw(self._screen, self._blue_team_current_sprite)
                 else:
                     blue_player.draw(self._screen, self._blue_team_sprite)
                 red_player.draw(self._screen, self._red_team_sprite)
