@@ -1,6 +1,6 @@
 import socket
 from _thread import *
-from main import FootballPitch
+from main import FootballPitch, Player
 import main
 import pickle
 import pygame
@@ -44,7 +44,7 @@ class GameView:
 
 class Server:
     def __init__(self):
-        self._server = "127.0.0.1"
+        self._server = "localhost"
         self._port = 5556
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._current_client_id = 0
@@ -59,28 +59,31 @@ class Server:
         conn.send(pickle.dumps(self._football_pitch))
         while True:
             try:
-                data = pickle.loads(conn.recv(2048))
+                data = pickle.loads(conn.recv(1024))   # zmieniam data z football_pitch na playera
                 if client_id == 0:
-                    if self._football_pitch.player1.team[0].x != data.player1.team[0].x or \
-                            self._football_pitch.player1.team[0].y != data.player1.team[0].y:
-                        print(f"Player 1 is moving from: ({self._football_pitch.player1.team[0].x}, "
-                              f"{self._football_pitch.player1.team[0].y}) to ({data.player1.team[0].x}, {data.player1.team[0].y})")
-                    self._football_pitch.player1 = data.player1
-                    self._football_pitch.ball = data.ball
+                    # if self._football_pitch.player1.team[0].x != data.player1.team[0].x or \
+                    #         self._football_pitch.player1.team[0].y != data.player1.team[0].y:
+                    #     print(f"Player 1 is moving from: ({self._football_pitch.player1.team[0].x}, "
+                    #           f"{self._football_pitch.player1.team[0].y}) to ({data.player1.team[0].x}, {data.player1.team[0].y})")
+                    self._football_pitch.player1(data)
+                    print(f'{self._football_pitch.player1.team[0].x}, {self._football_pitch.player1.team[0].y}')
+                    #  self._football_pitch.ball = data.ball
+                    conn.sendall(pickle.dumps(self._football_pitch.player2))
 
                 elif client_id == 1:
-                    if self._football_pitch.player2.team[0].x != data.player2.team[0].x or \
-                            self._football_pitch.player2.team[0].y != data.player2.team[0].y:
-                        print(f"Player 2 is moving from: ({self._football_pitch.player2.team[0].x}, "
-                              f"{self._football_pitch.player2.team[0].y}) to ({data.player2.team[0].x}, {data.player2.team[0].y})")
+                    # if self._football_pitch.player2.team[0].x != data.player2.team[0].x or \
+                    #         self._football_pitch.player2.team[0].y != data.player2.team[0].y:
+                    #     print(f"Player 2 is moving from: ({self._football_pitch.player2.team[0].x}, "
+                    #           f"{self._football_pitch.player2.team[0].y}) to ({data.player2.team[0].x}, {data.player2.team[0].y})")
 
-                    self._football_pitch.player2 = data.player2
+                    self._football_pitch.player2 = data
+                    conn.sendall(pickle.dumps(self._football_pitch.player1))
 
                 if not data:
                     print(f"Client{client_id} disconnected with server")
                     break
 
-                conn.sendall(pickle.dumps(self._football_pitch))
+                #conn.sendall(pickle.dumps(self._football_pitch))
             except Exception as e:
                 print(e)
                 break

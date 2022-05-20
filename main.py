@@ -3,6 +3,7 @@ import os
 from network import Network
 import pickle
 from math import sqrt, cos, sin
+from _thread import *
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 1200, 604
 GAME_BALL_SIZE = 27
@@ -248,24 +249,25 @@ class Game:
         elif self._football_pitch.player_id == 2:
             self._football_pitch.player2.move_footballer()
 
-    def update_football_pitch(self, received_pitch):
+    def update_football_pitch(self):
         if self._football_pitch.player_id == 1:
-            self._football_pitch.player2 = received_pitch.player2
+            self._football_pitch.player2 = self._network.send(self._football_pitch.player1)
         elif self._football_pitch.player_id == 2:
-            self._football_pitch.player1 = received_pitch.player1
+            self._football_pitch.player1 = self._network.send(self._football_pitch.player2)
 
         # z tą piłką to trzeba będzie się dobrze zastanowić jak to ma działać xDDD
-        self._football_pitch.ball = received_pitch.ball
+        #self._football_pitch.ball = received_pitch.ball
 
     def game_loop(self):
         self._clock.tick(144)
         while self._game_run:
-            self.update_football_pitch(self._network.send(self._football_pitch))
+            self.update_football_pitch()
             self.blit_screen()
             self.event_catcher()
             self.player_move()
             self.player_change_event()
-            self._football_pitch.ball.move_automatic()
+            if self._football_pitch.player_id == 1:
+                self._football_pitch.ball.move_automatic()
 
 
 if __name__ == '__main__':
