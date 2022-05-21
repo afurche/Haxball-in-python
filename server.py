@@ -7,6 +7,7 @@ import pygame
 import os
 
 
+
 class GameView:
     def __init__(self, football_pitch):
         pygame.init()

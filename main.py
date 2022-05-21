@@ -4,15 +4,15 @@ from network import Network
 import pickle
 from math import sqrt, cos, sin
 from _thread import *
-
 from typing import Tuple
+from time import sleep
 
 SCREEN_WIDTH, SCREEN_HEIGHT = 1200, 604
 GAME_BALL_SIZE = 27
 PLAYER_BALL_SIZE = 54
 RED_TEAM_START_POSITIONS = [(200, 130), (200, 280), (200, 430)]
 BLUE_TEAM_START_POSITIONS = [(950, 130), (950, 280), (950, 430)]
-STANDARD_VELOCITY = 7
+STANDARD_VELOCITY = 4
 SPRINT_VELOCITY = 10
 
 
@@ -261,12 +261,6 @@ class Game:
         elif self._football_pitch.player_id == 2:
             self._football_pitch.player2.move_footballer()
 
-    def update_football_pitch(self):
-        if self._football_pitch.player_id == 1:
-            self._football_pitch.player2.set_players_coord(self._network.send(self._football_pitch.player1.get_players_coord()))
-        elif self._football_pitch.player_id == 2:
-            self._football_pitch.player1.set_players_coord(self._network.send(self._football_pitch.player2.get_players_coord()))
-
         # z tą piłką to trzeba będzie się dobrze zastanowić jak to ma działać xDDD
         #self._football_pitch.ball = received_pitch.ball
 
@@ -274,13 +268,15 @@ class Game:
         self._network.connect_to_server()
         self._football_pitch = self._network.football_pitch
         while self._game_run:
-            self.update_football_pitch()
+            if self._football_pitch.player_id == 1:
+                self._football_pitch.player2.set_players_coord(self._network.send(self._football_pitch.player1.get_players_coord()))
+            elif self._football_pitch.player_id == 2:
+                self._football_pitch.player1.set_players_coord(self._network.send(self._football_pitch.player2.get_players_coord()))
 
     def game_loop(self):
-        self._clock.tick(144)
         start_new_thread(self.communication_thread, ())
         while self._game_run:
-            # self.update_football_pitch()
+            self._clock.tick(30)
             if self._football_pitch is not None:
                 self.blit_screen()
                 self.event_catcher()
