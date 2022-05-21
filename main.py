@@ -12,8 +12,8 @@ GAME_BALL_SIZE = 27
 PLAYER_BALL_SIZE = 54
 RED_TEAM_START_POSITIONS = [(200, 130), (200, 280), (200, 430)]
 BLUE_TEAM_START_POSITIONS = [(950, 130), (950, 280), (950, 430)]
-STANDARD_VELOCITY = 4
-SPRINT_VELOCITY = 10
+STANDARD_VELOCITY = 20
+SPRINT_VELOCITY = 100
 
 
 class BallObject:
@@ -21,8 +21,8 @@ class BallObject:
         self._x = start_x
         self._y = start_y
         self._radius = ball_size / 2
-        self._standard_velocity = STANDARD_VELOCITY
-        self._sprint_velocity = SPRINT_VELOCITY
+        self._standard_velocity = 7
+        self._sprint_velocity = 10
 
     @property
     def coord(self):
@@ -72,30 +72,39 @@ class TeamPlayer(BallObject):
 
     def move(self):
         keys = pygame.key.get_pressed()
+        standard_velocity = 8
 
         if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._x > 30:
             if keys[pygame.K_LSHIFT]:
                 self._x -= self._sprint_velocity
+                print(self.sprint_velocity)
             else:
-                self._x -= self._standard_velocity
+                self._x -= standard_velocity #, self._standard_velocity
+                print(self.standard_velocity)
 
         if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and self._x < 1170:
             if keys[pygame.K_LSHIFT]:
                 self._x += self._sprint_velocity
+                print(self.sprint_velocity)
             else:
                 self._x += self._standard_velocity
+                print(self.standard_velocity)
 
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._y > 30:
             if keys[pygame.K_LSHIFT]:
                 self._y -= self._sprint_velocity
+                print(self.sprint_velocity)
             else:
                 self._y -= self._standard_velocity
+                print(self.standard_velocity)
 
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self._y < 574:
             if keys[pygame.K_LSHIFT]:
                 self._y += self._sprint_velocity
+                print(self.sprint_velocity)
             else:
                 self._y += self._standard_velocity
+                print(self.standard_velocity)
 
     @property
     def is_current(self):
@@ -276,7 +285,7 @@ class Game:
     def game_loop(self):
         start_new_thread(self.communication_thread, ())
         while self._game_run:
-            self._clock.tick(30)
+            self._clock.tick(60)
             if self._football_pitch is not None:
                 self.blit_screen()
                 self.event_catcher()

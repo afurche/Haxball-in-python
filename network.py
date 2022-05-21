@@ -31,8 +31,3 @@ class Network:
         except socket.error as err:
             print(err)
 
-
-if __name__ == 'main':
-    n = Network()
-    print(n.send("hello"))
-    print(n.send("working"))
