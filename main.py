@@ -5,6 +5,8 @@ import pickle
 from math import sqrt, cos, sin
 from _thread import *
 
+from typing import Tuple
+
 SCREEN_WIDTH, SCREEN_HEIGHT = 1200, 604
 GAME_BALL_SIZE = 27
 PLAYER_BALL_SIZE = 54
@@ -141,6 +143,15 @@ class Player:
         self.current_player.is_current = False
         self._team[min_distance_player_index].is_current = True
 
+    def get_players_coord(self) -> Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]:
+        return tuple(team_player.coord for team_player in self._team)
+
+    def set_players_coord(self, player_coord: Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]):
+        for team_player, coord in zip(self._team, player_coord):
+            team_player.x = coord[0]
+            team_player.y = coord[1]
+
+
 
 class FootballPitch:
     def __init__(self):
@@ -251,9 +262,9 @@ class Game:
 
     def update_football_pitch(self):
         if self._football_pitch.player_id == 1:
-            self._football_pitch.player2 = self._network.send(self._football_pitch.player1)
+            self._football_pitch.player2.set_players_coord(self._network.send(self._football_pitch.player1.get_players_coord()))
         elif self._football_pitch.player_id == 2:
-            self._football_pitch.player1 = self._network.send(self._football_pitch.player2)
+            self._football_pitch.player1.set_players_coord(self._network.send(self._football_pitch.player2.get_players_coord()))
 
         # z tą piłką to trzeba będzie się dobrze zastanowić jak to ma działać xDDD
         #self._football_pitch.ball = received_pitch.ball
@@ -266,6 +277,7 @@ class Game:
             self.event_catcher()
             self.player_move()
             self.player_change_event()
+            print(self._football_pitch.player1.get_players_coord())
             if self._football_pitch.player_id == 1:
                 self._football_pitch.ball.move_automatic()
 

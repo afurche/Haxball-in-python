@@ -59,16 +59,16 @@ class Server:
         conn.send(pickle.dumps(self._football_pitch))
         while True:
             try:
-                data = pickle.loads(conn.recv(1024))   # zmieniam data z football_pitch na playera
+                data = pickle.loads(conn.recv(512))   # zmieniam data z football_pitch na playera
                 if client_id == 0:
                     # if self._football_pitch.player1.team[0].x != data.player1.team[0].x or \
                     #         self._football_pitch.player1.team[0].y != data.player1.team[0].y:
                     #     print(f"Player 1 is moving from: ({self._football_pitch.player1.team[0].x}, "
                     #           f"{self._football_pitch.player1.team[0].y}) to ({data.player1.team[0].x}, {data.player1.team[0].y})")
-                    self._football_pitch.player1 = data
-                    print(f'{self._football_pitch.player1.team[0].x}, {self._football_pitch.player1.team[0].y}')
+                    self._football_pitch.player1.set_players_coord(data)
+                    # print(f'{self._football_pitch.player1.team[0].x}, {self._football_pitch.player1.team[0].y}')
                     #  self._football_pitch.ball = data.ball
-                    conn.sendall(pickle.dumps(self._football_pitch.player2))
+                    conn.sendall(pickle.dumps(self._football_pitch.player2.get_players_coord()))
 
                 elif client_id == 1:
                     # if self._football_pitch.player2.team[0].x != data.player2.team[0].x or \
@@ -76,8 +76,8 @@ class Server:
                     #     print(f"Player 2 is moving from: ({self._football_pitch.player2.team[0].x}, "
                     #           f"{self._football_pitch.player2.team[0].y}) to ({data.player2.team[0].x}, {data.player2.team[0].y})")
 
-                    self._football_pitch.player2 = data
-                    conn.sendall(pickle.dumps(self._football_pitch.player1))
+                    self._football_pitch.player2.set_players_coord(data)
+                    conn.sendall(pickle.dumps(self._football_pitch.player1.get_players_coord()))
 
                 if not data:
                     print(f"Client{client_id} disconnected with server")
