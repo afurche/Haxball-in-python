@@ -217,7 +217,8 @@ class Game:
         self._game_run = True
         self._is_player_changing_footballer = False
         self._network = Network()
-        self._football_pitch = self._network.football_pitch
+        self._football_pitch = None
+
 
     def player_change_event(self):
         if self._is_player_changing_footballer:
@@ -269,17 +270,24 @@ class Game:
         # z tą piłką to trzeba będzie się dobrze zastanowić jak to ma działać xDDD
         #self._football_pitch.ball = received_pitch.ball
 
-    def game_loop(self):
-        self._clock.tick(144)
+    def communication_thread(self):
+        self._network.connect_to_server()
+        self._football_pitch = self._network.football_pitch
         while self._game_run:
             self.update_football_pitch()
-            self.blit_screen()
-            self.event_catcher()
-            self.player_move()
-            self.player_change_event()
-            print(self._football_pitch.player1.get_players_coord())
-            if self._football_pitch.player_id == 1:
-                self._football_pitch.ball.move_automatic()
+
+    def game_loop(self):
+        self._clock.tick(144)
+        start_new_thread(self.communication_thread, ())
+        while self._game_run:
+            # self.update_football_pitch()
+            if self._football_pitch is not None:
+                self.blit_screen()
+                self.event_catcher()
+                self.player_move()
+                self.player_change_event()
+                if self._football_pitch.player_id == 1:
+                    self._football_pitch.ball.move_automatic()
 
 
 if __name__ == '__main__':
