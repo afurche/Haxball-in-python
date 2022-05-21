@@ -44,7 +44,7 @@ class GameView:
 
 class Server:
     def __init__(self):
-        self._server = "localhost"
+        self._server = "192.168.0.123"
         self._port = 5556
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._current_client_id = 0
@@ -65,7 +65,7 @@ class Server:
                     #         self._football_pitch.player1.team[0].y != data.player1.team[0].y:
                     #     print(f"Player 1 is moving from: ({self._football_pitch.player1.team[0].x}, "
                     #           f"{self._football_pitch.player1.team[0].y}) to ({data.player1.team[0].x}, {data.player1.team[0].y})")
-                    self._football_pitch.player1(data)
+                    self._football_pitch.player1 = data
                     print(f'{self._football_pitch.player1.team[0].x}, {self._football_pitch.player1.team[0].y}')
                     #  self._football_pitch.ball = data.ball
                     conn.sendall(pickle.dumps(self._football_pitch.player2))
