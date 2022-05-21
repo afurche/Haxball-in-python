@@ -7,7 +7,6 @@ import pygame
 import os
 
 
-
 class GameView:
     def __init__(self, football_pitch):
         pygame.init()
@@ -60,31 +59,28 @@ class Server:
         conn.send(pickle.dumps(self._football_pitch))
         while True:
             try:
-                data = pickle.loads(conn.recv(512))   # zmieniam data z football_pitch na playera
+                data = pickle.loads(conn.recv(512))
+                print(data)
                 if client_id == 0:
-                    # if self._football_pitch.player1.team[0].x != data.player1.team[0].x or \
-                    #         self._football_pitch.player1.team[0].y != data.player1.team[0].y:
-                    #     print(f"Player 1 is moving from: ({self._football_pitch.player1.team[0].x}, "
-                    #           f"{self._football_pitch.player1.team[0].y}) to ({data.player1.team[0].x}, {data.player1.team[0].y})")
-                    self._football_pitch.player1.set_players_coord(data)
-                    # print(f'{self._football_pitch.player1.team[0].x}, {self._football_pitch.player1.team[0].y}')
-                    #  self._football_pitch.ball = data.ball
-                    conn.sendall(pickle.dumps(self._football_pitch.player2.get_players_coord()))
+                    self._football_pitch.player1.set_players_coord(data[0])
+                    self._football_pitch.ball.x = data[1][0]
+                    self._football_pitch.ball.y = data[1][1]
+
+                    message = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord)
+                    conn.sendall(pickle.dumps(message))
 
                 elif client_id == 1:
-                    # if self._football_pitch.player2.team[0].x != data.player2.team[0].x or \
-                    #         self._football_pitch.player2.team[0].y != data.player2.team[0].y:
-                    #     print(f"Player 2 is moving from: ({self._football_pitch.player2.team[0].x}, "
-                    #           f"{self._football_pitch.player2.team[0].y}) to ({data.player2.team[0].x}, {data.player2.team[0].y})")
+                    self._football_pitch.player2.set_players_coord(data[0])
+                    self._football_pitch.ball.x = data[1][0]
+                    self._football_pitch.ball.y = data[1][1]
 
-                    self._football_pitch.player2.set_players_coord(data)
-                    conn.sendall(pickle.dumps(self._football_pitch.player1.get_players_coord()))
+                    message = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord)
+                    conn.sendall(pickle.dumps(message))
 
                 if not data:
                     print(f"Client{client_id} disconnected with server")
                     break
 
-                #conn.sendall(pickle.dumps(self._football_pitch))
             except Exception as e:
                 print(e)
                 break

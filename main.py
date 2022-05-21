@@ -212,7 +212,6 @@ class Player:
             team_player.y = coord[1]
 
 
-
 class FootballPitch:
     def __init__(self):
         self._player_id = 0
@@ -279,7 +278,6 @@ class Game:
         self._network = Network()
         self._football_pitch = None
 
-
     def player_change_event(self):
         if self._is_player_changing_footballer:
             self._football_pitch.player_footballer_change()
@@ -325,16 +323,26 @@ class Game:
         #self._football_pitch.ball = received_pitch.ball
 
     def communication_thread(self):
-        self._network.connect_to_server()
-        self._football_pitch = self._network.football_pitch
+
         while self._game_run:
             if self._football_pitch.player_id == 1:
-                self._football_pitch.player2.set_players_coord(self._network.send(self._football_pitch.player1.get_players_coord()))
+                message_to_send = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord)
+                received_message = self._network.send(message_to_send)
+                self._football_pitch.player2.set_players_coord(received_message[0])
+                self._football_pitch.ball.x = received_message[1][0]
+                self._football_pitch.ball.y = received_message[1][1]
             elif self._football_pitch.player_id == 2:
                 self._football_pitch.player1.set_players_coord(self._network.send(self._football_pitch.player2.get_players_coord()))
+                message_to_send = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord)
+                received_message = self._network.send(message_to_send)
+                self._football_pitch.player1.set_players_coord(received_message[0])
+                self._football_pitch.ball.x = received_message[1][0]
+                self._football_pitch.ball.y = received_message[1][1]
 
     def game_loop(self):
-        start_new_thread(self.communication_thread, ())
+        #  start_new_thread(self.communication_thread, ())
+        self._network.connect_to_server()
+        self._football_pitch = self._network.football_pitch
         while self._game_run:
             self._clock.tick(60)
             if self._football_pitch is not None:
@@ -342,9 +350,20 @@ class Game:
                 self.event_catcher()
                 self.player_move()
                 self.player_change_event()
+                self._football_pitch.ball.move_automatic()
                 if self._football_pitch.player_id == 1:
-                    self._football_pitch.ball.move_automatic()
-
+                    message_to_send = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord)
+                    received_message = self._network.send(message_to_send)
+                    self._football_pitch.player2.set_players_coord(received_message[0])
+                    self._football_pitch.ball.x = received_message[1][0]
+                    self._football_pitch.ball.y = received_message[1][1]
+                elif self._football_pitch.player_id == 2:
+                    self._football_pitch.player1.set_players_coord(self._network.send(self._football_pitch.player2.get_players_coord()))
+                    message_to_send = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord)
+                    received_message = self._network.send(message_to_send)
+                    self._football_pitch.player1.set_players_coord(received_message[0])
+                    self._football_pitch.ball.x = received_message[1][0]
+                    self._football_pitch.ball.y = received_message[1][1]
 
 if __name__ == '__main__':
     Game().game_loop()
