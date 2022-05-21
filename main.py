@@ -72,39 +72,90 @@ class TeamPlayer(BallObject):
 
     def move(self):
         keys = pygame.key.get_pressed()
-        standard_velocity = 8
 
         if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._x > 30:
-            if keys[pygame.K_LSHIFT]:
-                self._x -= self._sprint_velocity
-                print(self.sprint_velocity)
+            if keys[pygame.K_w] or keys[pygame.K_UP]:
+                if keys[pygame.K_LSHIFT]:
+                    self._x -= self._sprint_velocity / 2
+                    self._y -= self.standard_velocity / 2
+                else:
+                    self._x -= self._standard_velocity / 2
+                    self._y -= self.standard_velocity / 2
+            elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
+                if keys[pygame.K_LSHIFT]:
+                    self._x -= self._sprint_velocity / 2
+                    self._y += self.standard_velocity / 2
+                else:
+                    self._x -= self._standard_velocity / 2
+                    self._y += self.standard_velocity / 2
             else:
-                self._x -= standard_velocity #, self._standard_velocity
-                print(self.standard_velocity)
+                if keys[pygame.K_LSHIFT]:
+                    self._x -= self._sprint_velocity
+                else:
+                    self._x -= self._standard_velocity
 
         if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and self._x < 1170:
-            if keys[pygame.K_LSHIFT]:
-                self._x += self._sprint_velocity
-                print(self.sprint_velocity)
+            if keys[pygame.K_w] or keys[pygame.K_UP]:
+                if keys[pygame.K_LSHIFT]:
+                    self._x += self._sprint_velocity / 2
+                    self._y -= self.standard_velocity / 2
+                else:
+                    self._x += self._standard_velocity / 2
+                    self._y -= self.standard_velocity / 2
+            elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
+                if keys[pygame.K_LSHIFT]:
+                    self._x += self._sprint_velocity / 2
+                    self._y += self.standard_velocity / 2
+                else:
+                    self._x += self._standard_velocity / 2
+                    self._y += self.standard_velocity / 2
             else:
-                self._x += self._standard_velocity
-                print(self.standard_velocity)
+                if keys[pygame.K_LSHIFT]:
+                    self._x += self._sprint_velocity
+                else:
+                    self._x += self._standard_velocity
 
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._y > 30:
-            if keys[pygame.K_LSHIFT]:
-                self._y -= self._sprint_velocity
-                print(self.sprint_velocity)
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+                if keys[pygame.K_LSHIFT]:
+                    self._y -= self._sprint_velocity / 2
+                    self._x -= self._sprint_velocity / 2
+                else:
+                    self._y -= self._standard_velocity / 2
+                    self._x -= self._standard_velocity / 2
+            elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+                if keys[pygame.K_LSHIFT]:
+                    self._y -= self._sprint_velocity / 2
+                    self._x += self._sprint_velocity / 2
+                else:
+                    self._y -= self._standard_velocity / 2
+                    self._x += self._standard_velocity / 2
             else:
-                self._y -= self._standard_velocity
-                print(self.standard_velocity)
+                if keys[pygame.K_LSHIFT]:
+                    self._y -= self._sprint_velocity
+                else:
+                    self._y -= self._standard_velocity
 
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self._y < 574:
-            if keys[pygame.K_LSHIFT]:
-                self._y += self._sprint_velocity
-                print(self.sprint_velocity)
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+                if keys[pygame.K_LSHIFT]:
+                    self._y += self._sprint_velocity / 2
+                    self._x -= self._sprint_velocity / 2
+                else:
+                    self._y += self._standard_velocity / 2
+                    self._x -= self._standard_velocity / 2
+            elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+                if keys[pygame.K_LSHIFT]:
+                    self._y += self._sprint_velocity / 2
+                    self._x += self._sprint_velocity / 2
+                else:
+                    self._y += self._standard_velocity / 2
+                    self._x += self._standard_velocity / 2
             else:
-                self._y += self._standard_velocity
-                print(self.standard_velocity)
+                if keys[pygame.K_LSHIFT]:
+                    self._y += self._sprint_velocity
+                else:
+                    self._y += self._standard_velocity
 
     @property
     def is_current(self):
