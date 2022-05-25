@@ -60,19 +60,18 @@ class Server:
         while True:
             try:
                 data = pickle.loads(conn.recv(512))
-                print(data)
                 if client_id == 0:
                     self._football_pitch.player1.set_players_coord(data[0])
-                    self._football_pitch.ball.x = data[1][0]
-                    self._football_pitch.ball.y = data[1][1]
+                    if self._football_pitch.ball.coord != data[1]:
+                        self._football_pitch.ball.coord = data[1]
 
                     message = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord)
                     conn.sendall(pickle.dumps(message))
 
                 elif client_id == 1:
                     self._football_pitch.player2.set_players_coord(data[0])
-                    self._football_pitch.ball.x = data[1][0]
-                    self._football_pitch.ball.y = data[1][1]
+                    if self._football_pitch.ball.coord != data[1]:
+                        self._football_pitch.ball.coord = data[1]
 
                     message = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord)
                     conn.sendall(pickle.dumps(message))

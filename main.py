@@ -12,8 +12,8 @@ GAME_BALL_SIZE = 27
 PLAYER_BALL_SIZE = 54
 RED_TEAM_START_POSITIONS = [(200, 130), (200, 280), (200, 430)]
 BLUE_TEAM_START_POSITIONS = [(950, 130), (950, 280), (950, 430)]
-STANDARD_VELOCITY = 20
-SPRINT_VELOCITY = 100
+STANDARD_VELOCITY = 10
+SPRINT_VELOCITY = 17
 
 
 class BallObject:
@@ -21,12 +21,17 @@ class BallObject:
         self._x = start_x
         self._y = start_y
         self._radius = ball_size / 2
-        self._standard_velocity = 7
-        self._sprint_velocity = 10
+        self._standard_velocity = STANDARD_VELOCITY
+        self._sprint_velocity = SPRINT_VELOCITY
 
     @property
     def coord(self):
         return self._x, self._y
+
+    @coord.setter
+    def coord(self, coord):
+        self._x = coord[0]
+        self._y = coord[1]
 
     def draw(self, screen, sprite):
         pygame.draw.circle(screen, color='black', center=self.coord, radius=self._radius)
@@ -174,7 +179,7 @@ class GameBall(BallObject):
     def move_automatic(self):
         self.y = int(cos(self._angle) * 100) + SCREEN_HEIGHT / 2
         self.x = int(sin(self._angle) * 100) + SCREEN_WIDTH / 2
-        self._angle += 0.05
+        self._angle += 0.2
 
 
 class Player:
@@ -208,8 +213,7 @@ class Player:
 
     def set_players_coord(self, player_coord: Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]):
         for team_player, coord in zip(self._team, player_coord):
-            team_player.x = coord[0]
-            team_player.y = coord[1]
+            team_player.coord = coord
 
 
 class FootballPitch:
@@ -266,17 +270,19 @@ class Game:
         pygame.init()
         self._screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption('Mini Football')
-        self._background_sprite = pygame.image.load(os.path.join('assets', 'haxmap.png'))
-        self._red_team_sprite = pygame.image.load(os.path.join('assets', 'red_player.png'))
-        self._blue_team_sprite = pygame.image.load(os.path.join('assets', 'blue_player.png'))
-        self._red_team_current_sprite = pygame.image.load(os.path.join('assets', 'red_player_current.png'))
-        self._blue_team_current_sprite = pygame.image.load(os.path.join('assets', 'blue_player_current.png'))
-        self._ball_sprite = pygame.image.load(os.path.join('assets', 'ball.png'))
+        self._background_sprite = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'haxmap.png')), (SCREEN_WIDTH, SCREEN_HEIGHT))
+        self._red_team_sprite = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'red_player.png')), (PLAYER_BALL_SIZE, PLAYER_BALL_SIZE))
+        self._blue_team_sprite = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'blue_player.png')), (PLAYER_BALL_SIZE, PLAYER_BALL_SIZE))
+        self._red_team_current_sprite = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'red_player_current.png')), (PLAYER_BALL_SIZE, PLAYER_BALL_SIZE))
+        self._blue_team_current_sprite = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'blue_player_current.png')), (PLAYER_BALL_SIZE, PLAYER_BALL_SIZE))
+        self._ball_sprite = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'ball.png')), (GAME_BALL_SIZE, GAME_BALL_SIZE))
         self._clock = pygame.time.Clock()
         self._game_run = True
         self._is_player_changing_footballer = False
         self._network = Network()
         self._football_pitch = None
+        self._last_send_message = None
+        self._last_received_message = None
 
     def player_change_event(self):
         if self._is_player_changing_footballer:
@@ -319,51 +325,37 @@ class Game:
         elif self._football_pitch.player_id == 2:
             self._football_pitch.player2.move_footballer()
 
-        # z tą piłką to trzeba będzie się dobrze zastanowić jak to ma działać xDDD
-        #self._football_pitch.ball = received_pitch.ball
-
     def communication_thread(self):
-
-        while self._game_run:
-            if self._football_pitch.player_id == 1:
-                message_to_send = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord)
-                received_message = self._network.send(message_to_send)
-                self._football_pitch.player2.set_players_coord(received_message[0])
-                self._football_pitch.ball.x = received_message[1][0]
-                self._football_pitch.ball.y = received_message[1][1]
-            elif self._football_pitch.player_id == 2:
-                self._football_pitch.player1.set_players_coord(self._network.send(self._football_pitch.player2.get_players_coord()))
-                message_to_send = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord)
-                received_message = self._network.send(message_to_send)
-                self._football_pitch.player1.set_players_coord(received_message[0])
-                self._football_pitch.ball.x = received_message[1][0]
-                self._football_pitch.ball.y = received_message[1][1]
-
-    def game_loop(self):
-        #  start_new_thread(self.communication_thread, ())
         self._network.connect_to_server()
         self._football_pitch = self._network.football_pitch
         while self._game_run:
-            self._clock.tick(60)
+            if self._football_pitch.player_id == 1:
+                message_to_send = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord)
+                self._last_send_message = message_to_send
+                received_message = self._network.send(message_to_send)
+                self._football_pitch.player2.set_players_coord(received_message[0])
+                if self._last_send_message[1] != received_message[1]:
+                    self._football_pitch.ball.coord = received_message[1]
+            elif self._football_pitch.player_id == 2:
+                message_to_send = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord)
+                self._last_send_message = message_to_send
+                received_message = self._network.send(message_to_send)
+                self._football_pitch.player1.set_players_coord(received_message[0])
+                if self._last_send_message[1] != received_message[1]:
+                    self._football_pitch.ball.coord = received_message[1]
+
+    def game_loop(self):
+        start_new_thread(self.communication_thread, ())
+        # self._network.connect_to_server()
+        # self._football_pitch = self._network.football_pitch
+        while self._game_run:
+            self._clock.tick(30)
             if self._football_pitch is not None:
                 self.blit_screen()
                 self.event_catcher()
                 self.player_move()
                 self.player_change_event()
-                self._football_pitch.ball.move_automatic()
-                if self._football_pitch.player_id == 1:
-                    message_to_send = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord)
-                    received_message = self._network.send(message_to_send)
-                    self._football_pitch.player2.set_players_coord(received_message[0])
-                    self._football_pitch.ball.x = received_message[1][0]
-                    self._football_pitch.ball.y = received_message[1][1]
-                elif self._football_pitch.player_id == 2:
-                    self._football_pitch.player1.set_players_coord(self._network.send(self._football_pitch.player2.get_players_coord()))
-                    message_to_send = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord)
-                    received_message = self._network.send(message_to_send)
-                    self._football_pitch.player1.set_players_coord(received_message[0])
-                    self._football_pitch.ball.x = received_message[1][0]
-                    self._football_pitch.ball.y = received_message[1][1]
+
 
 if __name__ == '__main__':
     Game().game_loop()

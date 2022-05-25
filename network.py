@@ -31,3 +31,15 @@ class Network:
         except socket.error as err:
             print(err)
 
+    # def send_ball(self, data):
+    #     try:
+    #         self._client.send(pickle.dumps(data))
+    #     except socket.error as err:
+    #         print(err)
+    #
+    # def receive_ball(self):
+    #     try:
+    #         return pickle.loads(self._client.recv(512))
+    #     except socket.error as err:
+    #         print(err)
+
