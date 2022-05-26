@@ -77,6 +77,8 @@ class TeamPlayer(BallObject):
         self._start_x = start_x
         self._start_y = start_y
         self._move_backward = False
+        self.returned_to_start_position = False
+        self._is_moving_automatically = False
 
     def move(self):
         keys = pygame.key.get_pressed()
@@ -172,16 +174,32 @@ class TeamPlayer(BallObject):
     @is_current.setter
     def is_current(self, new_is_current):
         self._is_current = new_is_current
+        if new_is_current:
+            self.returned_to_start_position = False
 
-    def move_automatic(self):  # initial version - to be extended
-        if self.coord[0] <= self._start_x + 150 and not self._move_backward:
-            self.x += 5
-        elif self.coord[0] >= self._start_x + 150 and not self._move_backward:
-            self._move_backward = True
-        elif self.coord[0] > self._start_x - 150 and self._move_backward:
-            self.x -= 5
-        elif self.coord[0] <= self._start_x - 150 and self._move_backward:
-            self._move_backward = False
+    def move_automatic(self):
+
+        if self.returned_to_start_position:
+            if self.x <= self._start_x + 150 and not self._move_backward:
+                self.x += 5
+            elif self.x >= self._start_x + 150 and not self._move_backward:
+                self._move_backward = True
+            elif self.x > self._start_x - 150 and self._move_backward:
+                self.x -= 5
+            elif self.x <= self._start_x - 150 and self._move_backward:
+                self._move_backward = False
+        else:
+            if self.y < self._start_y + 10:
+                self.y += 1
+            elif self.y > self._start_y + 10:
+                self.y -= 1
+            else:
+                if self.x < self._start_x + 10:
+                    self.x += 1
+                elif self.x > self._start_x + 10:
+                    self.x -= 1
+                else:
+                    self.returned_to_start_position = True
 
 
 class GameBall(BallObject):
