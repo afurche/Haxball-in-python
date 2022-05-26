@@ -79,6 +79,7 @@ class TeamPlayer(BallObject):
         self._move_backward = False
         self.returned_to_start_position = False
         self._is_moving_automatically = False
+        self._horizontal_strategy = True
 
     def move(self):
         keys = pygame.key.get_pressed()
@@ -177,29 +178,60 @@ class TeamPlayer(BallObject):
         if new_is_current:
             self.returned_to_start_position = False
 
+    @property
+    def horizontal_strategy(self):
+        return self._horizontal_strategy
+
+    @horizontal_strategy.setter
+    def horizontal_strategy(self, strategy):
+        self._horizontal_strategy = strategy
+
     def move_automatic(self):
 
-        if self.returned_to_start_position:
-            if self.x <= self._start_x + 150 and not self._move_backward:
-                self.x += 5
-            elif self.x >= self._start_x + 150 and not self._move_backward:
-                self._move_backward = True
-            elif self.x > self._start_x - 150 and self._move_backward:
-                self.x -= 5
-            elif self.x <= self._start_x - 150 and self._move_backward:
-                self._move_backward = False
-        else:
-            if self.y < self._start_y + 10:
-                self.y += 1
-            elif self.y > self._start_y + 10:
-                self.y -= 1
+        if self._horizontal_strategy:
+            if self.returned_to_start_position:
+                if self.x <= self._start_x + 150 and not self._move_backward:
+                    self.x += 5
+                elif self.x >= self._start_x + 150 and not self._move_backward:
+                    self._move_backward = True
+                elif self.x > self._start_x - 150 and self._move_backward:
+                    self.x -= 5
+                elif self.x <= self._start_x - 150 and self._move_backward:
+                    self._move_backward = False
             else:
-                if self.x < self._start_x + 10:
-                    self.x += 1
-                elif self.x > self._start_x + 10:
-                    self.x -= 1
+                if self.y < self._start_y - 5:
+                    self.y += 5
+                elif self.y > self._start_y + 5:
+                    self.y -= 5
                 else:
-                    self.returned_to_start_position = True
+                    if self.x < self._start_x - 5:
+                        self.x += 5
+                    elif self.x > self._start_x + 5:
+                        self.x -= 5
+                    else:
+                        self.returned_to_start_position = True
+        else:
+            if self.returned_to_start_position:
+                if self.y <= self._start_y + 100 and not self._move_backward:
+                    self.y += 5
+                elif self.y >= self._start_y + 100 and not self._move_backward:
+                    self._move_backward = True
+                elif self.y > self._start_y - 100 and self._move_backward:
+                    self.y -= 5
+                elif self.y <= self._start_y - 100 and self._move_backward:
+                    self._move_backward = False
+            else:
+                if self.y < self._start_y - 5:
+                    self.y += 5
+                elif self.y > self._start_y + 5:
+                    self.y -= 5
+                else:
+                    if self.x < self._start_x - 5:
+                        self.x += 5
+                    elif self.x > self._start_x + 5:
+                        self.x -= 5
+                    else:
+                        self.returned_to_start_position = True
 
 
 class GameBall(BallObject):
@@ -247,6 +279,12 @@ class Player:
     def set_players_coord(self, player_coord: Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]):
         for team_player, coord in zip(self._team, player_coord):
             team_player.coord = coord
+
+    def change_strategy(self):
+        for team_player in self._team:
+            if not team_player.is_current:
+                team_player.returned_to_start_position = False
+                team_player._horizontal_strategy = not team_player.horizontal_strategy
 
 
 class FootballPitch:
@@ -297,6 +335,12 @@ class FootballPitch:
         elif self._player_id == 2:
             self._player2.change_to_player_closest_to_ball(self._ball.coord)
 
+    def player_strategy_change(self):
+        if self._player_id == 1:
+            self._player1.change_strategy()
+        else:
+            self._player2.change_strategy()
+
 
 class Game:
     def __init__(self):
@@ -316,11 +360,17 @@ class Game:
         self._football_pitch = None
         self._last_send_message = None
         self._last_received_message = None
+        self._is_player_changing_strategy = False
 
     def player_change_event(self):
         if self._is_player_changing_footballer:
             self._football_pitch.player_footballer_change()
             self._is_player_changing_footballer = False
+
+    def player_change_strategy(self):
+        if self._is_player_changing_strategy:
+            self._football_pitch.player_strategy_change()
+            self._is_player_changing_strategy = False
 
     def event_catcher(self):
         for event in pygame.event.get():
@@ -330,6 +380,8 @@ class Game:
                 if event.key == pygame.K_e:
                     if not self._is_player_changing_footballer:
                         self._is_player_changing_footballer = True
+                if event.key == pygame.K_q:
+                    self._is_player_changing_strategy = True
 
     def blit_players(self):
         for red_player, blue_player in zip(self._football_pitch.player1.team, self._football_pitch.player2.team):
@@ -386,6 +438,7 @@ class Game:
                 self.event_catcher()
                 self.player_move()
                 self.player_change_event()
+                self.player_change_strategy()
                 if self._football_pitch.player_id == 1:
                     self._football_pitch.ball.move_automatic()
 
