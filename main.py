@@ -272,6 +272,8 @@ class Player:
         min_distance_player_index = min(distance_dict, key=lambda k: distance_dict.get(k))
         self.current_player.is_current = False
         self._team[min_distance_player_index].is_current = True
+        self._team[min_distance_player_index].horizontal_strategy = self._team[(min_distance_player_index + 1) % len(self._team)].horizontal_strategy
+        print(f"Index: {min_distance_player_index}{self._team[min_distance_player_index].horizontal_strategy},  Index:{(min_distance_player_index + 1) % len(self._team)}{self._team[(min_distance_player_index + 1) % len(self._team)].horizontal_strategy}")
 
     def get_players_coord(self) -> Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]:
         return tuple(team_player.coord for team_player in self._team)
@@ -437,8 +439,8 @@ class Game:
                 self.blit_screen()
                 self.event_catcher()
                 self.player_move()
-                self.player_change_event()
                 self.player_change_strategy()
+                self.player_change_event()
                 if self._football_pitch.player_id == 1:
                     self._football_pitch.ball.move_automatic()
 
