@@ -70,8 +70,8 @@ class Server:
 
                 elif client_id == 1:
                     self._football_pitch.player2.set_players_coord(data[0])
-                    if self._football_pitch.ball.coord != data[1]:
-                        self._football_pitch.ball.coord = data[1]
+                    # if self._football_pitch.ball.coord != data[1]:
+                    #     self._football_pitch.ball.coord = data[1]
 
                     message = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord)
                     conn.sendall(pickle.dumps(message))

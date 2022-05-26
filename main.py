@@ -74,6 +74,9 @@ class TeamPlayer(BallObject):
     def __init__(self, start_x, start_y):
         super().__init__(start_x, start_y, PLAYER_BALL_SIZE)
         self._is_current = False
+        self._start_x = start_x
+        self._start_y = start_y
+        self._move_backward = False
 
     def move(self):
         keys = pygame.key.get_pressed()
@@ -170,6 +173,16 @@ class TeamPlayer(BallObject):
     def is_current(self, new_is_current):
         self._is_current = new_is_current
 
+    def move_automatic(self):  # initial version - to be extended
+        if self.coord[0] <= self._start_x + 150 and not self._move_backward:
+            self.x += 5
+        elif self.coord[0] >= self._start_x + 150 and not self._move_backward:
+            self._move_backward = True
+        elif self.coord[0] > self._start_x - 150 and self._move_backward:
+            self.x -= 5
+        elif self.coord[0] <= self._start_x - 150 and self._move_backward:
+            self._move_backward = False
+
 
 class GameBall(BallObject):
     def __init__(self):
@@ -191,6 +204,8 @@ class Player:
         for player in self._team:
             if player.is_current:
                 player.move()
+            else:
+                player.move_automatic()
 
     @property
     def team(self):
@@ -353,6 +368,8 @@ class Game:
                 self.event_catcher()
                 self.player_move()
                 self.player_change_event()
+                if self._football_pitch.player_id == 1:
+                    self._football_pitch.ball.move_automatic()
 
 
 if __name__ == '__main__':
