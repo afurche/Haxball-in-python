@@ -12,8 +12,8 @@ GAME_BALL_SIZE = 27
 PLAYER_BALL_SIZE = 54
 RED_TEAM_START_POSITIONS = [(200, 130), (200, 280), (200, 430)]
 BLUE_TEAM_START_POSITIONS = [(950, 130), (950, 280), (950, 430)]
-STANDARD_VELOCITY = 10
-SPRINT_VELOCITY = 17
+STANDARD_VELOCITY = 14
+SPRINT_VELOCITY = 21
 
 
 class BallObject:
@@ -79,7 +79,7 @@ class TeamPlayer(BallObject):
         keys = pygame.key.get_pressed()
 
         if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._x > 30:
-            if keys[pygame.K_w] or keys[pygame.K_UP]:
+            if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._x > 30:
                 if keys[pygame.K_LSHIFT]:
                     self._x -= self._sprint_velocity / 2
                     self._y -= self.standard_velocity / 2
@@ -100,7 +100,7 @@ class TeamPlayer(BallObject):
                     self._x -= self._standard_velocity
 
         if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and self._x < 1170:
-            if keys[pygame.K_w] or keys[pygame.K_UP]:
+            if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._x < 1170:
                 if keys[pygame.K_LSHIFT]:
                     self._x += self._sprint_velocity / 2
                     self._y -= self.standard_velocity / 2
@@ -121,7 +121,7 @@ class TeamPlayer(BallObject):
                     self._x += self._standard_velocity
 
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._y > 30:
-            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._y > 30:
                 if keys[pygame.K_LSHIFT]:
                     self._y -= self._sprint_velocity / 2
                     self._x -= self._sprint_velocity / 2
@@ -142,7 +142,7 @@ class TeamPlayer(BallObject):
                     self._y -= self._standard_velocity
 
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self._y < 574:
-            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._y < 574:
                 if keys[pygame.K_LSHIFT]:
                     self._y += self._sprint_velocity / 2
                     self._x -= self._sprint_velocity / 2
@@ -346,8 +346,6 @@ class Game:
 
     def game_loop(self):
         start_new_thread(self.communication_thread, ())
-        # self._network.connect_to_server()
-        # self._football_pitch = self._network.football_pitch
         while self._game_run:
             self._clock.tick(30)
             if self._football_pitch is not None:
