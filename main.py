@@ -23,6 +23,7 @@ class BallObject:
         self._radius = ball_size / 2
         self._standard_velocity = STANDARD_VELOCITY
         self._sprint_velocity = SPRINT_VELOCITY
+        self._circle = None  # represents pygame circle object
 
     @property
     def coord(self):
@@ -34,7 +35,7 @@ class BallObject:
         self._y = coord[1]
 
     def draw(self, screen, sprite):
-        pygame.draw.circle(screen, color='black', center=self.coord, radius=self._radius)
+        self._circle = pygame.draw.circle(screen, color='black', center=self.coord, radius=self._radius)
         screen.blit(sprite, tuple(coord - self._radius for coord in self.coord))
 
     @property
@@ -68,6 +69,10 @@ class BallObject:
     @sprint_velocity.setter
     def sprint_velocity(self, new_velocity):
         self._sprint_velocity = new_velocity
+
+    @property
+    def circle(self):
+        return self._circle
 
 
 class TeamPlayer(BallObject):
@@ -343,6 +348,16 @@ class FootballPitch:
         else:
             self._player2.change_strategy()
 
+    def check_player_collisions_with_ball(self):
+        player_tmp = None
+        if self._player_id == 1:
+            player_tmp = self._player1
+        else:
+            player_tmp = self._player2
+
+        for team_player in player_tmp.team:
+            if team_player.circle.colliderect(self._ball.circle):
+                print("wololo")
 
 class Game:
     def __init__(self):
@@ -441,6 +456,7 @@ class Game:
                 self.player_move()
                 self.player_change_strategy()
                 self.player_change_event()
+                self._football_pitch.check_player_collisions_with_ball()
                 if self._football_pitch.player_id == 1:
                     self._football_pitch.ball.move_automatic()
 
