@@ -48,6 +48,8 @@ class Server:
         self._port = 5556
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._current_client_id = 0
+        self._player1_ball_buffer = None
+        self._player2_ball_buffer = None
         try:
             self._sock.bind((self._server, self._port))
         except socket.error as err:
@@ -62,17 +64,28 @@ class Server:
                 data = pickle.loads(conn.recv(512))
                 if client_id == 0:
                     self._football_pitch.player1.set_players_coord(data[0])
-                    if self._football_pitch.ball.coord != data[1]:
+
+                    if self._player1_ball_buffer is None:
+                        self._player1_ball_buffer = data[1]
+
+                    if self._player1_ball_buffer != data[1]:
                         self._football_pitch.ball.coord = data[1]
+
+                    self._player1_ball_buffer = data[1]
 
                     message = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord)
                     conn.sendall(pickle.dumps(message))
 
                 elif client_id == 1:
                     self._football_pitch.player2.set_players_coord(data[0])
-                    # if self._football_pitch.ball.coord != data[1]:
-                    #     self._football_pitch.ball.coord = data[1]
 
+                    if self._player2_ball_buffer is None:
+                        self._player2_ball_buffer = data[1]
+
+                    if self._player2_ball_buffer != data[1]:
+                        self._football_pitch.ball.coord = data[1]
+
+                    self._player2_ball_buffer = data[1]
                     message = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord)
                     conn.sendall(pickle.dumps(message))
 
