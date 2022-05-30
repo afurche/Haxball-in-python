@@ -221,49 +221,73 @@ class TeamPlayer(BallObject):
     def touches_ball(self, tb):
         self._touches_ball = tb
 
-    def move_automatic(self):
+    def move_automatic(self, ball):
         if self._horizontal_strategy:
             if self.returned_to_start_position:
                 if self.x <= self._start_x + 150 and not self._move_backward:
                     self.x += 5
+                    if self._touches_ball:
+                        ball.current_velocity = [5, 0]
                 elif self.x >= self._start_x + 150 and not self._move_backward:
                     self._move_backward = True
                 elif self.x > self._start_x - 150 and self._move_backward:
                     self.x -= 5
+                    if self._touches_ball:
+                        ball.current_velocity = [-5, 0]
                 elif self.x <= self._start_x - 150 and self._move_backward:
                     self._move_backward = False
             else:
                 if self.y < self._start_y - 5:
                     self.y += 5
+                    if self._touches_ball:
+                        ball.current_velocity = [0, 5]
                 elif self.y > self._start_y + 5:
                     self.y -= 5
+                    if self._touches_ball:
+                        ball.current_velocity = [0, -5]
                 else:
                     if self.x < self._start_x - 5:
                         self.x += 5
+                        if self._touches_ball:
+                            ball.current_velocity = [5, 0]
                     elif self.x > self._start_x + 5:
                         self.x -= 5
+                        if self._touches_ball:
+                            ball.current_velocity = [-5, 0]
                     else:
                         self.returned_to_start_position = True
         else:
             if self.returned_to_start_position:
                 if self.y <= self._start_y + 100 and not self._move_backward:
                     self.y += 5
+                    if self._touches_ball:
+                        ball.current_velocity = [0, 5]
                 elif self.y >= self._start_y + 100 and not self._move_backward:
                     self._move_backward = True
                 elif self.y > self._start_y - 100 and self._move_backward:
                     self.y -= 5
+                    if self._touches_ball:
+                        ball.current_velocity = [0, -5]
                 elif self.y <= self._start_y - 100 and self._move_backward:
                     self._move_backward = False
             else:
                 if self.y < self._start_y - 5:
                     self.y += 5
+                    if self._touches_ball:
+                        ball.current_velocity = [0, 5]
                 elif self.y > self._start_y + 5:
                     self.y -= 5
+                    if self._touches_ball:
+                        ball.current_velocity = [0, -5]
                 else:
                     if self.x < self._start_x - 5:
                         self.x += 5
+                        if self._touches_ball:
+                            ball.current_velocity = [5, 0]
                     elif self.x > self._start_x + 5:
                         self.x -= 5
+                        if self._touches_ball:
+                            ball.current_velocity = [-5, 0]
                     else:
                         self.returned_to_start_position = True
 
@@ -316,9 +340,9 @@ class GameBall(BallObject):
     def ball_movement(self):
 
         if self.check_x_axis_field_collision():
-            self.vel_x = self.vel_x * (-1) * 0.5
+            self.vel_x = self.vel_x * (-1)
         if self.check_y_axis_field_collision():
-            self.vel_y = self.vel_y * (-1) * 0.5
+            self.vel_y = self.vel_y * (-1)
 
         if abs(self.vel_x) != 0:
             print(self.vel_x)
@@ -347,7 +371,7 @@ class Player:
             if player.is_current:
                 player.move(self._game_ball)
             else:
-                player.move_automatic()
+                player.move_automatic(self._game_ball)
 
     @property
     def team(self):
