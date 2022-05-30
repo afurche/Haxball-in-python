@@ -87,6 +87,9 @@ class TeamPlayer(BallObject):
         self._horizontal_strategy = True
         self._touches_ball = False
 
+    # WAŻNE !!!!!!!!
+    # Trzeba poprawić żeby posuwanie piłki nie działało kiedy kierunek poruszania zawodnika jak w przeciwną stronę niż piłka !!!!!
+
     def move(self, ball):
         keys = pygame.key.get_pressed()
 
