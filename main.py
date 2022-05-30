@@ -298,17 +298,17 @@ class GameBall(BallObject):
         self._current_directional_velocity = new_vel
 
     def check_x_axis_field_collision(self):
-        if self.x < 0 + GAME_BALL_SIZE + 20:
+        if self.x < 0 + GAME_BALL_SIZE + 50:
             return 'LEFT'
-        elif self.x > SCREEN_WIDTH - GAME_BALL_SIZE - 20:
+        elif self.x > SCREEN_WIDTH - GAME_BALL_SIZE - 50:
             return 'RIGHT'
         else:
             return None
 
     def check_y_axis_field_collision(self):
-        if self.y < 0 + GAME_BALL_SIZE + 20:
+        if self.y < 0 + GAME_BALL_SIZE + 50:
             return 'TOP'
-        elif self.y > SCREEN_HEIGHT - GAME_BALL_SIZE - 30:
+        elif self.y > SCREEN_HEIGHT - GAME_BALL_SIZE - 50:
             return 'BOTTOM'
         else:
             return None
@@ -316,28 +316,24 @@ class GameBall(BallObject):
     def ball_movement(self):
 
         if self.check_x_axis_field_collision():
-            self.vel_x = int(self.vel_x * (-1) * 0.5)
+            self.vel_x = self.vel_x * (-1) * 0.5
         if self.check_y_axis_field_collision():
-            self.vel_y = int(self.vel_y * (-1) * 0.5)
+            self.vel_y = self.vel_y * (-1) * 0.5
 
         if abs(self.vel_x) != 0:
             print(self.vel_x)
             self.x += self.vel_x
-            if self.vel_x > 0:
-                self.vel_x = self.vel_x - int(0.20 * self.vel_x)
+            if self.vel_x >= 0:
+                self.vel_x = self.vel_x - 0.05 * self.vel_x
             else:
-                self.vel_x = self.vel_x + int(0.20 * self.vel_x)
-            if 0 < self.vel_x < 1 or 0 > self.vel_x > -1:
-                self.vel_x = 0
+                self.vel_x = self.vel_x + 0.05 * (self.vel_x * (-1))
 
         if abs(self.vel_y) != 0:
             self.y += self.vel_y
-            if self.vel_y > 0:
-                self.vel_y = self.vel_y - int(0.20 * self.vel_y)
+            if self.vel_y >= 0:
+                self.vel_y = self.vel_y - 0.05 * self.vel_y
             else:
-                self.vel_y = self.vel_y + int(0.20 * self.vel_y)
-            if 0 < self.vel_y < 1 or 0 > self.vel_y > -1:
-                self.vel_y = 0
+                self.vel_y = self.vel_y + 0.05 * (self.vel_y * (-1))
 
 
 class Player:
