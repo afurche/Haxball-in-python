@@ -12,7 +12,7 @@ GAME_BALL_SIZE = 27
 PLAYER_BALL_SIZE = 54
 RED_TEAM_START_POSITIONS = [(200, 130), (200, 280), (200, 430)]
 BLUE_TEAM_START_POSITIONS = [(950, 130), (950, 280), (950, 430)]
-STANDARD_VELOCITY = 14
+STANDARD_VELOCITY = 8
 SPRINT_VELOCITY = 21
 
 
@@ -86,9 +86,6 @@ class TeamPlayer(BallObject):
         self._is_moving_automatically = False
         self._horizontal_strategy = True
         self._touches_ball = False
-
-    # WAŻNE !!!!!!!!
-    # Trzeba poprawić żeby posuwanie piłki nie działało kiedy kierunek poruszania zawodnika jak w przeciwną stronę niż piłka !!!!!
 
     def move(self, ball):
         keys = pygame.key.get_pressed()
@@ -230,13 +227,15 @@ class TeamPlayer(BallObject):
                 if self.x <= self._start_x + 150 and not self._move_backward:
                     self.x += 5
                     if self._touches_ball:
-                        ball.current_velocity = [5, 0]
+                        if self.x < ball.x:
+                            ball.current_velocity = [10, 0]
                 elif self.x >= self._start_x + 150 and not self._move_backward:
                     self._move_backward = True
                 elif self.x > self._start_x - 150 and self._move_backward:
                     self.x -= 5
                     if self._touches_ball:
-                        ball.current_velocity = [-5, 0]
+                        if self.x > ball.x:
+                            ball.current_velocity = [-10, 0]
                 elif self.x <= self._start_x - 150 and self._move_backward:
                     self._move_backward = False
             else:
@@ -264,13 +263,13 @@ class TeamPlayer(BallObject):
                 if self.y <= self._start_y + 100 and not self._move_backward:
                     self.y += 5
                     if self._touches_ball:
-                        ball.current_velocity = [0, 5]
+                        ball.current_velocity = [0, 10]
                 elif self.y >= self._start_y + 100 and not self._move_backward:
                     self._move_backward = True
                 elif self.y > self._start_y - 100 and self._move_backward:
                     self.y -= 5
                     if self._touches_ball:
-                        ball.current_velocity = [0, -5]
+                        ball.current_velocity = [0, -10]
                 elif self.y <= self._start_y - 100 and self._move_backward:
                     self._move_backward = False
             else:
