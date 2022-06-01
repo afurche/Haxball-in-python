@@ -15,6 +15,8 @@ BLUE_TEAM_START_POSITIONS = [(850, 130), (850, 280), (850, 430)]
 STANDARD_VELOCITY = 5
 GAME_BALL_STRAIGHT_VELOCITY = 6
 GAME_BALL_DIAGONAL_VELOCITY = 3
+GAME_BALL_KICK_STRAIGHT_VELOCITY = 10
+GAME_BALL_KICK_DIAGONAL_VELOCITY = 6
 BOTTOM_SCORE_STRIP_COLOR = (101, 143, 96)
 
 
@@ -89,18 +91,27 @@ class TeamPlayer(BallObject):
                 self._x -= self._standard_velocity / 2
                 self._y -= self.standard_velocity / 2
                 if self._touches_ball:
-                    ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                    else:
+                        ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
 
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
                 self._x -= self._standard_velocity / 2
                 self._y += self.standard_velocity / 2
                 if self._touches_ball:
-                    ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                    else:
+                        ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
 
             else:
                 self._x -= self._standard_velocity
                 if self._touches_ball:
-                    ball.current_velocity = [-GAME_BALL_STRAIGHT_VELOCITY, 0]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [-GAME_BALL_KICK_STRAIGHT_VELOCITY, 0]
+                    else:
+                        ball.current_velocity = [-GAME_BALL_STRAIGHT_VELOCITY, 0]
 
         if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and self._x < 1170:
 
@@ -108,36 +119,55 @@ class TeamPlayer(BallObject):
                 self._x += self._standard_velocity / 2
                 self._y -= self.standard_velocity / 2
                 if self._touches_ball:
-                    ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                    else:
+                        ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
 
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
                 self._x += self._standard_velocity / 2
                 self._y += self.standard_velocity / 2
                 if self._touches_ball:
-                    ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                    else:
+                        ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
 
             else:
                 self._x += self._standard_velocity
                 if self._touches_ball:
-                    ball.current_velocity = [GAME_BALL_STRAIGHT_VELOCITY, 0]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [GAME_BALL_KICK_STRAIGHT_VELOCITY, 0]
+                    else:
+                        ball.current_velocity = [GAME_BALL_STRAIGHT_VELOCITY, 0]
 
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._y > 30:
+
             if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._y > 30:
                 self._y -= self._standard_velocity / 2
                 self._x -= self._standard_velocity / 2
                 if self._touches_ball:
-                    ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                    else:
+                        ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
 
             elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self._y -= self._standard_velocity / 2
                 self._x += self._standard_velocity / 2
                 if self._touches_ball:
-                    ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                    else:
+                        ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
 
             else:
                 self._y -= self._standard_velocity
                 if self._touches_ball:
-                    ball.current_velocity = [0, -GAME_BALL_STRAIGHT_VELOCITY]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [0, -GAME_BALL_KICK_STRAIGHT_VELOCITY]
+                    else:
+                        ball.current_velocity = [0, -GAME_BALL_STRAIGHT_VELOCITY]
 
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self._y < 574:
 
@@ -145,18 +175,27 @@ class TeamPlayer(BallObject):
                 self._y += self._standard_velocity / 2
                 self._x -= self._standard_velocity / 2
                 if self._touches_ball:
-                    ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                    else:
+                        ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
 
             elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self._y += self._standard_velocity / 2
                 self._x += self._standard_velocity / 2
                 if self._touches_ball:
-                    ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                    else:
+                        ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
 
             else:
                 self._y += self._standard_velocity
                 if self._touches_ball:
-                    ball.current_velocity = [0, GAME_BALL_STRAIGHT_VELOCITY]
+                    if keys[pygame.K_SPACE]:
+                        ball.current_velocity = [0, GAME_BALL_KICK_STRAIGHT_VELOCITY]
+                    else:
+                        ball.current_velocity = [0, GAME_BALL_STRAIGHT_VELOCITY]
 
     @property
     def is_current(self):
@@ -287,7 +326,7 @@ class GameBall(BallObject):
         self._current_directional_velocity = new_vel
 
     def check_x_axis_field_collision(self):
-        if ((self.x < 0 + GAME_BALL_SIZE + 50) and (self.y < 290 or self.y > 340)) or ((self.x > SCREEN_WIDTH - GAME_BALL_SIZE - 50) and (self.y < 290 or self.y > 340)):
+        if ((self.x < 0 + GAME_BALL_SIZE + 50) and (self.y < 290 or self.y > 340)) or ((self.x > SCREEN_WIDTH - GAME_BALL_SIZE - 50) and (self.y < 270 or self.y > 340)):
             return True
         else:
             return False

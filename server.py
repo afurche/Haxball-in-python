@@ -67,7 +67,6 @@ class Server:
             self._goal_was_added = True
             return True
         elif self._goal_was_added:
-            print("HELLO THERE !")
             self._goal_was_added = False
             return False
         else:
