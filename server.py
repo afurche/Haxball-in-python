@@ -50,11 +50,28 @@ class Server:
         self._current_client_id = 0
         self._player1_ball_buffer = None
         self._player2_ball_buffer = None
+        self._goal_was_added = False
         try:
             self._sock.bind((self._server, self._port))
         except socket.error as err:
             print(err)
         self._football_pitch = FootballPitch()
+
+    def add_goals_if_scored_goal(self):
+        if self._football_pitch.ball.x > 1150 and not self._goal_was_added:
+            self._football_pitch.player1_score += 1
+            self._goal_was_added = True
+            return True
+        elif self._football_pitch.ball.x < 50 and not self._goal_was_added:
+            self._football_pitch.player2_score += 1
+            self._goal_was_added = True
+            return True
+        elif self._goal_was_added:
+            print("HELLO THERE !")
+            self._goal_was_added = False
+            return False
+        else:
+            return False
 
     def client_thread(self, conn, client_id):
         self._football_pitch.player_id = client_id + 1
@@ -71,9 +88,12 @@ class Server:
                     if self._player1_ball_buffer != data[1]:
                         self._football_pitch.ball.coord = data[1]
 
+                    if self.add_goals_if_scored_goal():
+                        self._player1_ball_buffer = None
+
                     self._player1_ball_buffer = data[1]
 
-                    message = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord)
+                    message = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord, self._football_pitch.scores)
                     conn.sendall(pickle.dumps(message))
 
                 elif client_id == 1:
@@ -85,8 +105,12 @@ class Server:
                     if self._player2_ball_buffer != data[1]:
                         self._football_pitch.ball.coord = data[1]
 
+                    if self.add_goals_if_scored_goal():
+                        self._player2_ball_buffer = None
+
                     self._player2_ball_buffer = data[1]
-                    message = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord)
+
+                    message = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord, self._football_pitch.scores)
                     conn.sendall(pickle.dumps(message))
 
                 if not data:

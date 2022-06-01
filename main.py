@@ -7,13 +7,15 @@ from _thread import *
 from typing import Tuple
 from time import sleep
 
-SCREEN_WIDTH, SCREEN_HEIGHT = 1200, 604
+SCREEN_WIDTH, SCREEN_HEIGHT, PITCH_HEIGHT = 1200, 654, 604  # need to add bottom strip for score_board
 GAME_BALL_SIZE = 27
 PLAYER_BALL_SIZE = 54
-RED_TEAM_START_POSITIONS = [(200, 130), (200, 280), (200, 430)]
-BLUE_TEAM_START_POSITIONS = [(950, 130), (950, 280), (950, 430)]
-STANDARD_VELOCITY = 8
-SPRINT_VELOCITY = 21
+RED_TEAM_START_POSITIONS = [(350, 130), (350, 280), (350, 430)]
+BLUE_TEAM_START_POSITIONS = [(850, 130), (850, 280), (850, 430)]
+STANDARD_VELOCITY = 5
+GAME_BALL_STRAIGHT_VELOCITY = 6
+GAME_BALL_DIAGONAL_VELOCITY = 3
+BOTTOM_SCORE_STRIP_COLOR = (101, 143, 96)
 
 
 class BallObject:
@@ -22,7 +24,6 @@ class BallObject:
         self._y = start_y
         self._radius = ball_size / 2
         self._standard_velocity = STANDARD_VELOCITY
-        self._sprint_velocity = SPRINT_VELOCITY
         self._circle = None  # represents pygame circle object
 
     @property
@@ -63,14 +64,6 @@ class BallObject:
         self._standard_velocity = new_velocity
 
     @property
-    def sprint_velocity(self):
-        return self._sprint_velocity
-
-    @sprint_velocity.setter
-    def sprint_velocity(self, new_velocity):
-        self._sprint_velocity = new_velocity
-
-    @property
     def circle(self):
         return self._circle
 
@@ -91,109 +84,79 @@ class TeamPlayer(BallObject):
         keys = pygame.key.get_pressed()
 
         if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._x > 30:
+
             if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._x > 30:
-                if keys[pygame.K_LSHIFT]:
-                    self._x -= self._sprint_velocity / 2
-                    self._y -= self.standard_velocity / 2
-                else:
-                    self._x -= self._standard_velocity / 2
-                    self._y -= self.standard_velocity / 2
-                    if self._touches_ball:
-                        ball.current_velocity = [-5, -5]
+                self._x -= self._standard_velocity / 2
+                self._y -= self.standard_velocity / 2
+                if self._touches_ball:
+                    ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
-                if keys[pygame.K_LSHIFT]:
-                    self._x -= self._sprint_velocity / 2
-                    self._y += self.sprint_velocity / 2
-                else:
-                    self._x -= self._standard_velocity / 2
-                    self._y += self.standard_velocity / 2
-                    if self._touches_ball:
-                        ball.current_velocity = [-5, 5]
+                self._x -= self._standard_velocity / 2
+                self._y += self.standard_velocity / 2
+                if self._touches_ball:
+                    ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+
             else:
-                if keys[pygame.K_LSHIFT]:
-                    self._x -= self._sprint_velocity
-                else:
-                    self._x -= self._standard_velocity
-                    if self._touches_ball:
-                        ball.current_velocity = [-10, 0]
+                self._x -= self._standard_velocity
+                if self._touches_ball:
+                    ball.current_velocity = [-GAME_BALL_STRAIGHT_VELOCITY, 0]
+
         if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and self._x < 1170:
+
             if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._x < 1170:
-                if keys[pygame.K_LSHIFT]:
-                    self._x += self._sprint_velocity / 2
-                    self._y -= self.standard_velocity / 2
-                else:
-                    self._x += self._standard_velocity / 2
-                    self._y -= self.standard_velocity / 2
-                    if self._touches_ball:
-                        ball.current_velocity = [5, -5]
+                self._x += self._standard_velocity / 2
+                self._y -= self.standard_velocity / 2
+                if self._touches_ball:
+                    ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
-                if keys[pygame.K_LSHIFT]:
-                    self._x += self._sprint_velocity / 2
-                    self._y += self.standard_velocity / 2
-                else:
-                    self._x += self._standard_velocity / 2
-                    self._y += self.standard_velocity / 2
-                    if self._touches_ball:
-                        ball.current_velocity = [5, 5]
+                self._x += self._standard_velocity / 2
+                self._y += self.standard_velocity / 2
+                if self._touches_ball:
+                    ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+
             else:
-                if keys[pygame.K_LSHIFT]:
-                    self._x += self._sprint_velocity
-                else:
-                    self._x += self._standard_velocity
-                    if self._touches_ball:
-                        ball.current_velocity = [10, 0]
+                self._x += self._standard_velocity
+                if self._touches_ball:
+                    ball.current_velocity = [GAME_BALL_STRAIGHT_VELOCITY, 0]
+
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._y > 30:
             if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._y > 30:
-                if keys[pygame.K_LSHIFT]:
-                    self._y -= self._sprint_velocity / 2
-                    self._x -= self._sprint_velocity / 2
-                else:
-                    self._y -= self._standard_velocity / 2
-                    self._x -= self._standard_velocity / 2
-                    if self._touches_ball:
-                        ball.current_velocity = [-5, -5]
+                self._y -= self._standard_velocity / 2
+                self._x -= self._standard_velocity / 2
+                if self._touches_ball:
+                    ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+
             elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-                if keys[pygame.K_LSHIFT]:
-                    self._y -= self._sprint_velocity / 2
-                    self._x += self._sprint_velocity / 2
-                else:
-                    self._y -= self._standard_velocity / 2
-                    self._x += self._standard_velocity / 2
-                    if self._touches_ball:
-                        ball.current_velocity = [5, -5]
+                self._y -= self._standard_velocity / 2
+                self._x += self._standard_velocity / 2
+                if self._touches_ball:
+                    ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+
             else:
-                if keys[pygame.K_LSHIFT]:
-                    self._y -= self._sprint_velocity
-                else:
-                    self._y -= self._standard_velocity
-                    if self._touches_ball:
-                        ball.current_velocity = [0, -10]
+                self._y -= self._standard_velocity
+                if self._touches_ball:
+                    ball.current_velocity = [0, -GAME_BALL_STRAIGHT_VELOCITY]
+
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self._y < 574:
+
             if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._y < 574:
-                if keys[pygame.K_LSHIFT]:
-                    self._y += self._sprint_velocity / 2
-                    self._x -= self._sprint_velocity / 2
-                else:
-                    self._y += self._standard_velocity / 2
-                    self._x -= self._standard_velocity / 2
-                    if self._touches_ball:
-                        ball.current_velocity = [-5, 5]
+                self._y += self._standard_velocity / 2
+                self._x -= self._standard_velocity / 2
+                if self._touches_ball:
+                    ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+
             elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-                if keys[pygame.K_LSHIFT]:
-                    self._y += self._sprint_velocity / 2
-                    self._x += self._sprint_velocity / 2
-                else:
-                    self._y += self._standard_velocity / 2
-                    self._x += self._standard_velocity / 2
-                    if self._touches_ball:
-                        ball.current_velocity = [5, 5]
+                self._y += self._standard_velocity / 2
+                self._x += self._standard_velocity / 2
+                if self._touches_ball:
+                    ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+
             else:
-                if keys[pygame.K_LSHIFT]:
-                    self._y += self._sprint_velocity
-                else:
-                    self._y += self._standard_velocity
-                    if self._touches_ball:
-                        ball.current_velocity = [0, 10]
+                self._y += self._standard_velocity
+                if self._touches_ball:
+                    ball.current_velocity = [0, GAME_BALL_STRAIGHT_VELOCITY]
 
     @property
     def is_current(self):
@@ -296,7 +259,7 @@ class TeamPlayer(BallObject):
 
 class GameBall(BallObject):
     def __init__(self):
-        super().__init__(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, GAME_BALL_SIZE)
+        super().__init__(SCREEN_WIDTH / 2, PITCH_HEIGHT / 2, GAME_BALL_SIZE)
         self._current_directional_velocity = [0, 0]  # first value represent current speed in x axis and second represent current speed in y axis
 
     @property
@@ -324,20 +287,16 @@ class GameBall(BallObject):
         self._current_directional_velocity = new_vel
 
     def check_x_axis_field_collision(self):
-        if self.x < 0 + GAME_BALL_SIZE + 50:
-            return 'LEFT'
-        elif self.x > SCREEN_WIDTH - GAME_BALL_SIZE - 50:
-            return 'RIGHT'
+        if ((self.x < 0 + GAME_BALL_SIZE + 50) and (self.y < 290 or self.y > 340)) or ((self.x > SCREEN_WIDTH - GAME_BALL_SIZE - 50) and (self.y < 290 or self.y > 340)):
+            return True
         else:
-            return None
+            return False
 
     def check_y_axis_field_collision(self):
-        if self.y < 0 + GAME_BALL_SIZE + 50:
-            return 'TOP'
-        elif self.y > SCREEN_HEIGHT - GAME_BALL_SIZE - 50:
-            return 'BOTTOM'
+        if (self.y < 0 + GAME_BALL_SIZE + 30) or (self.y > SCREEN_HEIGHT - GAME_BALL_SIZE - 30):
+            return True
         else:
-            return None
+            return False
 
     def ball_movement(self):
 
@@ -347,7 +306,6 @@ class GameBall(BallObject):
             self.vel_y = self.vel_y * (-1)
 
         if abs(self.vel_x) != 0:
-            print(self.vel_x)
             self.x += self.vel_x
             if self.vel_x >= 0:
                 self.vel_x = self.vel_x - 0.05 * self.vel_x
@@ -360,6 +318,11 @@ class GameBall(BallObject):
                 self.vel_y = self.vel_y - 0.05 * self.vel_y
             else:
                 self.vel_y = self.vel_y + 0.05 * (self.vel_y * (-1))
+
+    def reset_ball_after_goal(self):
+        self.coord = (SCREEN_WIDTH / 2, PITCH_HEIGHT / 2)
+        self.vel_x = 0
+        self.vel_y = 0
 
 
 class Player:
@@ -406,6 +369,10 @@ class Player:
                 team_player.returned_to_start_position = False
                 team_player._horizontal_strategy = not team_player.horizontal_strategy
 
+    def reset_team_after_goal(self, coord_list):
+        for team_player, coord in zip(self._team, coord_list):
+            team_player.coord = coord
+
 
 class FootballPitch:
     def __init__(self):
@@ -413,6 +380,8 @@ class FootballPitch:
         self._ball = GameBall()
         self._player1 = Player(RED_TEAM_START_POSITIONS, self._ball)
         self._player2 = Player(BLUE_TEAM_START_POSITIONS, self._ball)
+        self._player1_score = 0
+        self._player2_score = 0
 
     @property
     def player1(self):
@@ -449,6 +418,31 @@ class FootballPitch:
     def ball(self, ball):
         self._ball = ball
 
+    @property
+    def player1_score(self):
+        return self._player1_score
+
+    @player1_score.setter
+    def player1_score(self, new_score):
+        self._player1_score = new_score
+
+    @property
+    def player2_score(self):
+        return self._player2_score
+
+    @player2_score.setter
+    def player2_score(self, new_score):
+        self._player2_score = new_score
+
+    @property
+    def scores(self):
+        return self._player1_score, self._player2_score
+
+    @scores.setter
+    def scores(self, new_scores):
+        self._player1_score = new_scores[0]
+        self._player2_score = new_scores[1]
+
     def player_footballer_change(self):
         if self._player_id == 1:
             self._player1.change_to_player_closest_to_ball(self._ball.coord)
@@ -473,13 +467,19 @@ class FootballPitch:
             else:
                 team_player.touches_ball = False
 
+    def reset_pitch_after_goal(self):
+        self._player1.reset_team_after_goal(RED_TEAM_START_POSITIONS)
+        self._player2.reset_team_after_goal(BLUE_TEAM_START_POSITIONS)
+        self._ball.reset_ball_after_goal()
+
 
 class Game:
     def __init__(self):
         pygame.init()
         self._screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption('Mini Football')
-        self._background_sprite = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'haxmap.png')), (SCREEN_WIDTH, SCREEN_HEIGHT))
+        self._screen.fill(BOTTOM_SCORE_STRIP_COLOR)
+        self._background_sprite = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'haxmap.png')), (SCREEN_WIDTH, PITCH_HEIGHT))
         self._red_team_sprite = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'red_player.png')), (PLAYER_BALL_SIZE, PLAYER_BALL_SIZE))
         self._blue_team_sprite = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'blue_player.png')), (PLAYER_BALL_SIZE, PLAYER_BALL_SIZE))
         self._red_team_current_sprite = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'red_player_current.png')), (PLAYER_BALL_SIZE, PLAYER_BALL_SIZE))
@@ -530,10 +530,15 @@ class Game:
                     blue_player.draw(self._screen, self._blue_team_sprite)
                 red_player.draw(self._screen, self._red_team_sprite)
 
+    def blit_scoreboard(self):
+        self._screen.blit(pygame.font.Font(None, 45).render(f"RED {self._football_pitch.player1_score}:{self._football_pitch.player2_score} BLUE", False, '#FFFFFF'), (500, 615))
+
     def blit_screen(self):
+        self._screen.fill(BOTTOM_SCORE_STRIP_COLOR)
         self._screen.blit(self._background_sprite, self._background_sprite.get_rect())
-        self._football_pitch.ball.draw(self._screen, self._ball_sprite)
         self.blit_players()
+        self._football_pitch.ball.draw(self._screen, self._ball_sprite)
+        self.blit_scoreboard()
         pygame.display.update()
 
     def player_move(self):
@@ -553,6 +558,9 @@ class Game:
                 self._football_pitch.player2.set_players_coord(received_message[0])
                 if self._last_send_message[1] != received_message[1]:
                     self._football_pitch.ball.coord = received_message[1]
+                if received_message[2] != self._football_pitch.scores:
+                    self._football_pitch.scores = received_message[2]
+                    self._football_pitch.reset_pitch_after_goal()
             elif self._football_pitch.player_id == 2:
                 message_to_send = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord)
                 self._last_send_message = message_to_send
@@ -560,6 +568,9 @@ class Game:
                 self._football_pitch.player1.set_players_coord(received_message[0])
                 if self._last_send_message[1] != received_message[1]:
                     self._football_pitch.ball.coord = received_message[1]
+                if received_message[2] != self._football_pitch.scores:
+                    self._football_pitch.scores = received_message[2]
+                    self._football_pitch.reset_pitch_after_goal()
 
     def game_loop(self):
         start_new_thread(self.communication_thread, ())
