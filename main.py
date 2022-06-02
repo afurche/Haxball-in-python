@@ -338,7 +338,7 @@ class GameBall(BallObject):
             return False
 
     def ball_movement(self):
-
+        print(self.current_velocity)
         if self.check_x_axis_field_collision():
             self.vel_x = self.vel_x * (-1)
         if self.check_y_axis_field_collision():
