@@ -1,7 +1,7 @@
 import socket
 from _thread import *
 from main import FootballPitch, Player
-import main
+from setup_variables import *
 import pickle
 import pygame
 import os
@@ -10,7 +10,7 @@ import os
 class GameView:
     def __init__(self, football_pitch):
         pygame.init()
-        self._screen = pygame.display.set_mode((main.SCREEN_WIDTH, main.SCREEN_HEIGHT))
+        self._screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption('Server view')
         self._background_sprite = pygame.image.load(os.path.join('assets', 'haxmap.png'))
         self._red_team_sprite = pygame.image.load(os.path.join('assets', 'red_player.png'))
