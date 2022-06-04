@@ -14,111 +14,9 @@ class TeamPlayer(BallObject):
         self._is_moving_automatically = False
         self._horizontal_strategy = True
         self._touches_ball = False
+        self._ball_push_velocity = [0, 0]
 
-    # def move(self, ball):
-    #     keys = pygame.key.get_pressed()
-    #
-    #     if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._x > 30:
-    #
-    #         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._x > 30:
-    #             self._x -= self._standard_velocity / 2
-    #             self._y -= self.standard_velocity / 2
-    #             if keys[pygame.K_SPACE]:
-    #                 return [-GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
-    #             else:
-    #                 return [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
-    #
-    #         elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
-    #             self._x -= self._standard_velocity / 2
-    #             self._y += self.standard_velocity / 2
-    #             if keys[pygame.K_SPACE]:
-    #                 return [-GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
-    #             else:
-    #                 return [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
-    #
-    #         else:
-    #             self._x -= self._standard_velocity
-    #             if keys[pygame.K_SPACE]:
-    #                 return [-GAME_BALL_KICK_STRAIGHT_VELOCITY, 0]
-    #             else:
-    #                 return [-GAME_BALL_STRAIGHT_VELOCITY, 0]
-    #
-    #     if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and self._x < 1170:
-    #
-    #         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._x < 1170:
-    #             self._x += self._standard_velocity / 2
-    #             self._y -= self.standard_velocity / 2
-    #             if keys[pygame.K_SPACE]:
-    #                 return [GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
-    #             else:
-    #                 return [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
-    #
-    #         elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
-    #             self._x += self._standard_velocity / 2
-    #             self._y += self.standard_velocity / 2
-    #             if keys[pygame.K_SPACE]:
-    #                 return [GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
-    #             else:
-    #                 return [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
-    #
-    #         else:
-    #             self._x += self._standard_velocity
-    #             if keys[pygame.K_SPACE]:
-    #                 return [GAME_BALL_KICK_STRAIGHT_VELOCITY, 0]
-    #             else:
-    #                 return [GAME_BALL_STRAIGHT_VELOCITY, 0]
-    #
-    #     if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._y > 30:
-    #
-    #         if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._y > 30:
-    #             self._y -= self._standard_velocity / 2
-    #             self._x -= self._standard_velocity / 2
-    #             if keys[pygame.K_SPACE]:
-    #                 return [-GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
-    #             else:
-    #                 return [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
-    #
-    #         elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-    #             self._y -= self._standard_velocity / 2
-    #             self._x += self._standard_velocity / 2
-    #             if keys[pygame.K_SPACE]:
-    #                 return [GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
-    #             else:
-    #                 return [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
-    #
-    #         else:
-    #             self._y -= self._standard_velocity
-    #             if keys[pygame.K_SPACE]:
-    #                 return [0, -GAME_BALL_KICK_STRAIGHT_VELOCITY]
-    #             else:
-    #                 return [0, -GAME_BALL_STRAIGHT_VELOCITY]
-    #
-    #     if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self._y < 574:
-    #
-    #         if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._y < 574:
-    #             self._y += self._standard_velocity / 2
-    #             self._x -= self._standard_velocity / 2
-    #             if keys[pygame.K_SPACE]:
-    #                 return [-GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
-    #             else:
-    #                 return [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
-    #
-    #         elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-    #             self._y += self._standard_velocity / 2
-    #             self._x += self._standard_velocity / 2
-    #             if keys[pygame.K_SPACE]:
-    #                 return [GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
-    #             else:
-    #                 return [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
-    #
-    #         else:
-    #             self._y += self._standard_velocity
-    #             if keys[pygame.K_SPACE]:
-    #                 return [0, GAME_BALL_KICK_STRAIGHT_VELOCITY]
-    #             else:
-    #                 return [0, GAME_BALL_STRAIGHT_VELOCITY]
-
-    def move(self, ball):
+    def move(self):
         keys = pygame.key.get_pressed()
 
         if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._x > 30:
@@ -126,112 +24,100 @@ class TeamPlayer(BallObject):
             if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._x > 30:
                 self._x -= self._standard_velocity / 2
                 self._y -= self.standard_velocity / 2
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
-                    else:
-                        ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                else:
+                    self._ball_push_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
 
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
                 self._x -= self._standard_velocity / 2
                 self._y += self.standard_velocity / 2
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
-                    else:
-                        ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                else:
+                    self._ball_push_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
 
             else:
                 self._x -= self._standard_velocity
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [-GAME_BALL_KICK_STRAIGHT_VELOCITY, 0]
-                    else:
-                        ball.current_velocity = [-GAME_BALL_STRAIGHT_VELOCITY, 0]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [-GAME_BALL_KICK_STRAIGHT_VELOCITY, 0]
+                else:
+                    self._ball_push_velocity = [-GAME_BALL_STRAIGHT_VELOCITY, 0]
 
         if (keys[pygame.K_d] or keys[pygame.K_RIGHT]) and self._x < 1170:
 
             if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._x < 1170:
                 self._x += self._standard_velocity / 2
                 self._y -= self.standard_velocity / 2
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
-                    else:
-                        ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                else:
+                    self._ball_push_velocity = [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
 
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
                 self._x += self._standard_velocity / 2
                 self._y += self.standard_velocity / 2
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
-                    else:
-                        ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                else:
+                    self._ball_push_velocity = [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
 
             else:
                 self._x += self._standard_velocity
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [GAME_BALL_KICK_STRAIGHT_VELOCITY, 0]
-                    else:
-                        ball.current_velocity = [GAME_BALL_STRAIGHT_VELOCITY, 0]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [GAME_BALL_KICK_STRAIGHT_VELOCITY, 0]
+                else:
+                    self._ball_push_velocity = [GAME_BALL_STRAIGHT_VELOCITY, 0]
 
         if (keys[pygame.K_w] or keys[pygame.K_UP]) and self._y > 30:
 
             if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._y > 30:
                 self._y -= self._standard_velocity / 2
                 self._x -= self._standard_velocity / 2
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
-                    else:
-                        ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                else:
+                    self._ball_push_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
 
             elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self._y -= self._standard_velocity / 2
                 self._x += self._standard_velocity / 2
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
-                    else:
-                        ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, -GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                else:
+                    self._ball_push_velocity = [GAME_BALL_DIAGONAL_VELOCITY, -GAME_BALL_DIAGONAL_VELOCITY]
 
             else:
                 self._y -= self._standard_velocity
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [0, -GAME_BALL_KICK_STRAIGHT_VELOCITY]
-                    else:
-                        ball.current_velocity = [0, -GAME_BALL_STRAIGHT_VELOCITY]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [0, -GAME_BALL_KICK_STRAIGHT_VELOCITY]
+                else:
+                    self._ball_push_velocity = [0, -GAME_BALL_STRAIGHT_VELOCITY]
 
         if (keys[pygame.K_s] or keys[pygame.K_DOWN]) and self._y < 574:
 
             if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._y < 574:
                 self._y += self._standard_velocity / 2
                 self._x -= self._standard_velocity / 2
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
-                    else:
-                        ball.current_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [-GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                else:
+                    self._ball_push_velocity = [-GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
 
             elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self._y += self._standard_velocity / 2
                 self._x += self._standard_velocity / 2
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
-                    else:
-                        ball.current_velocity = [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [GAME_BALL_KICK_DIAGONAL_VELOCITY, GAME_BALL_KICK_DIAGONAL_VELOCITY]
+                else:
+                    self._ball_push_velocity = [GAME_BALL_DIAGONAL_VELOCITY, GAME_BALL_DIAGONAL_VELOCITY]
 
             else:
                 self._y += self._standard_velocity
-                if self._touches_ball:
-                    if keys[pygame.K_SPACE]:
-                        ball.current_velocity = [0, GAME_BALL_KICK_STRAIGHT_VELOCITY]
-                    else:
-                        ball.current_velocity = [0, GAME_BALL_STRAIGHT_VELOCITY]
+                if keys[pygame.K_SPACE]:
+                    self._ball_push_velocity = [0, GAME_BALL_KICK_STRAIGHT_VELOCITY]
+                else:
+                    self._ball_push_velocity = [0, GAME_BALL_STRAIGHT_VELOCITY]
 
     @property
     def is_current(self):
@@ -258,6 +144,10 @@ class TeamPlayer(BallObject):
     @touches_ball.setter
     def touches_ball(self, tb):
         self._touches_ball = tb
+
+    @property
+    def ball_push_velocity(self):
+        return self._ball_push_velocity
 
     def move_automatic(self, ball):
         if self._horizontal_strategy:

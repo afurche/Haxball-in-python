@@ -97,6 +97,13 @@ class FootballPitch:
             else:
                 team_player.touches_ball = False
 
+    def check_player_collisions_with_ball_server(self):
+        for index, team_player in enumerate(self._player1.team + self._player2.team):
+            if team_player.circle.colliderect(self._ball.circle):
+                return team_player.coord, index
+            else:
+                return False, False
+
     def reset_pitch_after_goal(self):
         self._player1.reset_team_after_goal(RED_TEAM_START_POSITIONS)
         self._player2.reset_team_after_goal(BLUE_TEAM_START_POSITIONS)

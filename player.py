@@ -8,15 +8,13 @@ class Player:
         self._team = [TeamPlayer(coord[0], coord[1]) for coord in team_start_position]
         self._team[0].is_current = True
         self._game_ball = game_ball
-        self._ball_push_velocities = [[0, 0], [0, 0], [0, 0]]
 
     def move_footballer(self):
-        for index, player in enumerate(self._team):
-            if player.is_current:
-                # self._ball_push_velocities[index] = player.move(self._game_ball)
-                player.move(self._game_ball)
+        for index, team_player in enumerate(self._team):
+            if team_player.is_current:
+                team_player.move()
             else:
-                player.move_automatic(self._game_ball)
+                team_player.move_automatic(self._game_ball)
 
     @property
     def team(self):
@@ -27,6 +25,9 @@ class Player:
         for player in self._team:
             if player.is_current:
                 return player
+
+    def get_ball_push_velocities(self):
+        return [team_player.ball_push_velocity for team_player in self._team]
 
     def change_to_player_closest_to_ball(self, ball_coord: (int, int)) -> None:
         distance_dict = {index: sqrt(abs(ball_coord[0] - player.coord[0]) ** 2 + abs(ball_coord[1] - player.coord[1]) ** 2) for index, player in enumerate(self._team)}

@@ -48,9 +48,10 @@ class Server:
         self._port = 5556
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._current_client_id = 0
-        self._player1_ball_buffer = None
-        self._player2_ball_buffer = None
         self._goal_was_added = False
+        self._player1_push_velocities = [[0, 0], [0, 0], [0, 0]]
+        self._player2_push_velocities = [[0, 0], [0, 0], [0, 0]]
+
         try:
             self._sock.bind((self._server, self._port))
         except socket.error as err:
@@ -81,16 +82,18 @@ class Server:
                 if client_id == 0:
                     self._football_pitch.player1.set_players_coord(data[0])
 
-                    if self._player1_ball_buffer is None:
-                        self._player1_ball_buffer = data[1]
+                    self._player1_push_velocities = data[1]
 
-                    if self._player1_ball_buffer != data[1]:
-                        self._football_pitch.ball.coord = data[1]
-
+                    # if self._player1_ball_buffer is None:
+                    #     self._player1_ball_buffer = data[1]
+                    #
+                    # if self._player1_ball_buffer != data[1]:
+                    #     self._football_pitch.ball.coord = data[1]
+                    #
                     if self.add_goals_if_scored_goal():
-                        self._player1_ball_buffer = None
-
-                    self._player1_ball_buffer = data[1]
+                        self._player1_push_velocities = [[0, 0], [0, 0], [0, 0]]
+                    #
+                    # self._player1_ball_buffer = data[1]
 
                     message = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord, self._football_pitch.scores)
                     conn.sendall(pickle.dumps(message))
@@ -98,16 +101,18 @@ class Server:
                 elif client_id == 1:
                     self._football_pitch.player2.set_players_coord(data[0])
 
-                    if self._player2_ball_buffer is None:
-                        self._player2_ball_buffer = data[1]
+                    self._player2_push_velocities = data[1]
 
-                    if self._player2_ball_buffer != data[1]:
-                        self._football_pitch.ball.coord = data[1]
-
+                    # if self._player2_ball_buffer is None:
+                    #     self._player2_ball_buffer = data[1]
+                    #
+                    # if self._player2_ball_buffer != data[1]:
+                    #     self._football_pitch.ball.coord = data[1]
+                    #
                     if self.add_goals_if_scored_goal():
-                        self._player2_ball_buffer = None
-
-                    self._player2_ball_buffer = data[1]
+                        self._player2_push_velocities = [[0, 0], [0, 0], [0, 0]]
+                    #
+                    # self._player2_ball_buffer = data[1]
 
                     message = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord, self._football_pitch.scores)
                     conn.sendall(pickle.dumps(message))
@@ -128,10 +133,27 @@ class Server:
         game_view = GameView(self._football_pitch)
         game_view.view_loop()
 
+    def ball_handling_thread(self):
+        while True:
+            self._football_pitch.ball.ball_movement()
+            if self._current_client_id > 0:
+                try:
+                    player_handling_ball_coord, index = self._football_pitch.check_player_collisions_with_ball_server()
+                    if player_handling_ball_coord:
+                        if index < 3:
+                            self._football_pitch.ball.current_velocity = self._player1_push_velocities[index]
+                        else:
+                            self._football_pitch.ball.current_velocity = self._player2_push_velocities[index % 3]
+                    else:
+                        print("not ok")
+                except AttributeError as e:
+                    print(e)
+
     def server_run(self):
         self._sock.listen(2)
         print("Server Started")
         start_new_thread(self.view_thread, ())
+        start_new_thread(self.ball_handling_thread, ())
         while True:
             conn, addr = self._sock.accept()
             print("Connected to:", addr)

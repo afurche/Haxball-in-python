@@ -30,7 +30,6 @@ class Game:
         self._network = Network()
         self._football_pitch = None
         self._last_send_message = None
-        self._last_received_message = None
         self._is_player_changing_strategy = False
 
     def player_change_event(self):
@@ -91,22 +90,18 @@ class Game:
         self._football_pitch = self._network.football_pitch
         while self._game_run:
             if self._football_pitch.player_id == 1:
-                message_to_send = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord)
-                self._last_send_message = message_to_send
+                message_to_send = (self._football_pitch.player1.get_players_coord(), self._football_pitch.player1.get_ball_push_velocities())
                 received_message = self._network.send(message_to_send)
                 self._football_pitch.player2.set_players_coord(received_message[0])
-                if self._last_send_message[1] != received_message[1]:
-                    self._football_pitch.ball.coord = received_message[1]
+                self._football_pitch.ball.coord = received_message[1]
                 if received_message[2] != self._football_pitch.scores:
                     self._football_pitch.scores = received_message[2]
                     self._football_pitch.reset_pitch_after_goal()
             elif self._football_pitch.player_id == 2:
-                message_to_send = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord)
-                self._last_send_message = message_to_send
+                message_to_send = (self._football_pitch.player2.get_players_coord(), self._football_pitch.player1.get_ball_push_velocities())
                 received_message = self._network.send(message_to_send)
                 self._football_pitch.player1.set_players_coord(received_message[0])
-                if self._last_send_message[1] != received_message[1]:
-                    self._football_pitch.ball.coord = received_message[1]
+                self._football_pitch.ball.coord = received_message[1]
                 if received_message[2] != self._football_pitch.scores:
                     self._football_pitch.scores = received_message[2]
                     self._football_pitch.reset_pitch_after_goal()
