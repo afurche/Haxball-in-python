@@ -51,7 +51,6 @@ class Server:
         self._goal_was_added = False
         self._player1_push_velocities = [[0, 0], [0, 0], [0, 0]]
         self._player2_push_velocities = [[0, 0], [0, 0], [0, 0]]
-
         try:
             self._sock.bind((self._server, self._port))
         except socket.error as err:
@@ -62,16 +61,17 @@ class Server:
         if self._football_pitch.ball.x > 1150 and not self._goal_was_added:
             self._football_pitch.player1_score += 1
             self._goal_was_added = True
-            return True
+            self._player1_push_velocities = [[0, 0], [0, 0], [0, 0]]
+            self._player2_push_velocities = [[0, 0], [0, 0], [0, 0]]
+            self._football_pitch.ball.reset_ball_after_goal()
         elif self._football_pitch.ball.x < 50 and not self._goal_was_added:
             self._football_pitch.player2_score += 1
+            self._player1_push_velocities = [[0, 0], [0, 0], [0, 0]]
+            self._player2_push_velocities = [[0, 0], [0, 0], [0, 0]]
             self._goal_was_added = True
-            return True
+            self._football_pitch.ball.reset_ball_after_goal()
         elif self._goal_was_added:
             self._goal_was_added = False
-            return False
-        else:
-            return False
 
     def client_thread(self, conn, client_id):
         self._football_pitch.player_id = client_id + 1
@@ -84,17 +84,6 @@ class Server:
 
                     self._player1_push_velocities = data[1]
 
-                    # if self._player1_ball_buffer is None:
-                    #     self._player1_ball_buffer = data[1]
-                    #
-                    # if self._player1_ball_buffer != data[1]:
-                    #     self._football_pitch.ball.coord = data[1]
-                    #
-                    if self.add_goals_if_scored_goal():
-                        self._player1_push_velocities = [[0, 0], [0, 0], [0, 0]]
-                    #
-                    # self._player1_ball_buffer = data[1]
-
                     message = (self._football_pitch.player2.get_players_coord(), self._football_pitch.ball.coord, self._football_pitch.scores)
                     conn.sendall(pickle.dumps(message))
 
@@ -102,17 +91,6 @@ class Server:
                     self._football_pitch.player2.set_players_coord(data[0])
 
                     self._player2_push_velocities = data[1]
-
-                    # if self._player2_ball_buffer is None:
-                    #     self._player2_ball_buffer = data[1]
-                    #
-                    # if self._player2_ball_buffer != data[1]:
-                    #     self._football_pitch.ball.coord = data[1]
-                    #
-                    if self.add_goals_if_scored_goal():
-                        self._player2_push_velocities = [[0, 0], [0, 0], [0, 0]]
-                    #
-                    # self._player2_ball_buffer = data[1]
 
                     message = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord, self._football_pitch.scores)
                     conn.sendall(pickle.dumps(message))
@@ -135,19 +113,16 @@ class Server:
 
     def ball_handling_thread(self):
         while True:
-            self._football_pitch.ball.ball_movement()
-            if self._current_client_id > 0:
-                try:
-                    player_handling_ball_coord, index = self._football_pitch.check_player_collisions_with_ball_server()
-                    if player_handling_ball_coord:
-                        if index < 3:
-                            self._football_pitch.ball.current_velocity = self._player1_push_velocities[index]
-                        else:
-                            self._football_pitch.ball.current_velocity = self._player2_push_velocities[index % 3]
+            for index, team_player in enumerate(self._football_pitch.player1.team + self._football_pitch.player2.team):
+                print(f'{index=}, {team_player.circle=}')
+                if team_player.circle.colliderect(self._football_pitch.ball.circle):
+                    if index < 3:
+                        self._football_pitch.ball.current_velocity = self._player1_push_velocities[index]
                     else:
-                        print("not ok")
-                except AttributeError as e:
-                    print(e)
+                        self._football_pitch.ball.current_velocity = self._player2_push_velocities[index % 3]
+
+            self._football_pitch.ball.ball_movement()
+            self.add_goals_if_scored_goal()
 
     def server_run(self):
         self._sock.listen(2)

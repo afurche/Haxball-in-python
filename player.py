@@ -1,6 +1,7 @@
 from team_player import TeamPlayer
 from typing import Tuple
 from setup_variables import *
+from math import sqrt, cos, sin
 
 
 class Player:
