@@ -8,7 +8,7 @@ class BallObject:
         self._y = start_y
         self._radius = ball_size / 2
         self._standard_velocity = STANDARD_VELOCITY
-        self._circle = pygame.Rect(self._x - self._radius, self._y - self._radius, self._radius * 2, self._radius * 2) #  pygame.Rect(0, 0, 0, 0)  # represents pygame circle object
+        self._circle = pygame.Rect(self._x - self._radius, self._y - self._radius, self._radius * 2, self._radius * 2)
 
     @property
     def coord(self):

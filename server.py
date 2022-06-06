@@ -38,6 +38,8 @@ class GameView:
 
     def view_loop(self):
         while self._view_run:
+            self._clock.tick(30)
+            self._football_pitch.ball.ball_movement()
             self.blit_screen()
             self.event_catcher()
 
@@ -114,15 +116,19 @@ class Server:
     def ball_handling_thread(self):
         while True:
             for index, team_player in enumerate(self._football_pitch.player1.team + self._football_pitch.player2.team):
-                print(f'{index=}, {team_player.circle=}')
                 if team_player.circle.colliderect(self._football_pitch.ball.circle):
                     if index < 3:
-                        self._football_pitch.ball.current_velocity = self._player1_push_velocities[index]
+                        if self._player1_push_velocities[index] != [0, 0]:
+                            self._football_pitch.ball.current_velocity = self._player1_push_velocities[index]
+                        else:
+                            self._football_pitch.ball.current_velocity = [(-1) * self._football_pitch.ball.vel_x / 2, (-1) * self._football_pitch.ball.vel_y / 2]
                     else:
-                        self._football_pitch.ball.current_velocity = self._player2_push_velocities[index % 3]
-
-            self._football_pitch.ball.ball_movement()
+                        if self._player1_push_velocities[index % 3] != [0, 0]:
+                            self._football_pitch.ball.current_velocity = self._player2_push_velocities[index % 3]
+                        else:
+                            self._football_pitch.ball.current_velocity = [(-1) * self._football_pitch.ball.vel_x / 2, (-1) * self._football_pitch.ball.vel_y / 2]
             self.add_goals_if_scored_goal()
+            print(f'Ball current velocity: {self._football_pitch.ball.current_velocity}')
 
     def server_run(self):
         self._sock.listen(2)

@@ -98,7 +98,7 @@ class Game:
                     self._football_pitch.scores = received_message[2]
                     self._football_pitch.reset_pitch_after_goal()
             elif self._football_pitch.player_id == 2:
-                message_to_send = (self._football_pitch.player2.get_players_coord(), self._football_pitch.player1.get_ball_push_velocities())
+                message_to_send = (self._football_pitch.player2.get_players_coord(), self._football_pitch.player2.get_ball_push_velocities())
                 received_message = self._network.send(message_to_send)
                 self._football_pitch.player1.set_players_coord(received_message[0])
                 self._football_pitch.ball.coord = received_message[1]
