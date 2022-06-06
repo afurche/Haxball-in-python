@@ -83,7 +83,7 @@ class Game:
         if self._football_pitch.player_id == 1:
             self._football_pitch.player1.move_footballer(1)
         elif self._football_pitch.player_id == 2:
-            self._football_pitch.player2.move_footballer()
+            self._football_pitch.player2.move_footballer(2)
 
     def communication_thread(self):
         self._network.connect_to_server()

@@ -8,14 +8,17 @@ class Player:
     def __init__(self, team_start_position, game_ball):
         self._team = [TeamPlayer(coord[0], coord[1]) for coord in team_start_position]
         self._team[0].is_current = True
+        self._team[1].is_goalkeeper = True
         self._game_ball = game_ball
 
-    def move_footballer(self):
+    def move_footballer(self, player_id):
         for index, team_player in enumerate(self._team):
+            player_goalkeeper_x = BLUE_TEAM_GOALKEEPER_X if player_id == 1 else RED_TEAM_GOALKEEPER_X
+            player_defender_x = BLUE_TEAM_DEFENDER_X if player_id == 1 else RED_TEAM_DEFENDER_X
             if team_player.is_current:
                 team_player.move()
             else:
-                team_player.advanced_move_automatic(self._game_ball)
+                team_player.advanced_move_automatic(player_goalkeeper_x, player_defender_x, self._game_ball)
 
     @property
     def team(self):

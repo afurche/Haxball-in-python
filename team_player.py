@@ -235,41 +235,39 @@ class TeamPlayer(BallObject):
                     else:
                         self.returned_to_start_position = True
 
-    def advanced_move_automatic(self, player_goal_x_coord, player_defender_x_coord, ball_y_coord):
+    def advanced_move_automatic(self, player_goal_x_coord, player_defender_x_coord, ball):
         if self._is_goalkeeper:
             if self._returned_to_goalkeeper_position:
-                if self.y > ball_y_coord:
-                    self._start_y -= 2
-                elif self._start_y < ball_y_coord:
-                    self.y += 2
-                else:
-                    self.y += 0
+                if ball.y + 5 < self.y and self.y > GOAL_UP_Y - PLAYER_BALL_SIZE:
+                    self.y -= 5
+                elif ball.y - 5 > self.y and self.y < GOAL_BOTTOM_Y + PLAYER_BALL_SIZE:
+                    self.y += 5
             else:
-                if self.y > (PITCH_HEIGHT / 2) - 5:
+                if self.y > (PITCH_HEIGHT / 2) + 5:
                     self.y -= 5
                 elif self.y < (PITCH_HEIGHT / 2) - 5:
-                    self.y -= 5
+                    self.y += 5
                 else:
-                    if self.x > player_goal_x_coord - 5:
+                    if self.x > player_goal_x_coord + 5:
                         self.x -= 5
                     else:
                         self._returned_to_goalkeeper_position = True
+                        print("GOALKEEPER SET")
 
         else:
             if self._returned_to_defender_position:
-                if self.y > ball_y_coord:
-                    self._start_y -= 2
-                elif self._start_y < ball_y_coord:
-                    self.y += 2
-                else:
-                    self.y += 0
+                if self.y > ball.y + 5:
+                    self.y -= 5
+                elif self.y < ball.y - 5:
+                    self.y += 5
             else:
-                if self.y > (PITCH_HEIGHT / 2) - 5:
+                if self.y > (PITCH_HEIGHT / 2) + 5:
                     self.y -= 5
                 elif self.y < (PITCH_HEIGHT / 2) - 5:
-                    self.y -= 5
+                    self.y += 5
                 else:
-                    if self.x > player_defender_x_coord - 5:
+                    if self.x > player_defender_x_coord + 5:
                         self.x -= 5
                     else:
                         self._returned_to_defender_position = True
+                        print("DEFENDER SET")

@@ -32,7 +32,7 @@ class GameBall(BallObject):
         self._current_directional_velocity = new_vel
 
     def check_x_axis_field_collision(self):
-        if ((self.x < 0 + GAME_BALL_SIZE + 50) and (self.y < 290 or self.y > 340)) or ((self.x > SCREEN_WIDTH - GAME_BALL_SIZE - 50) and (self.y < 270 or self.y > 340)):
+        if ((self.x < 0 + GAME_BALL_SIZE + 50) and (self.y < GOAL_UP_Y or self.y > GOAL_BOTTOM_Y)) or ((self.x > SCREEN_WIDTH - GAME_BALL_SIZE - 50) and (self.y < GOAL_UP_Y or self.y > GOAL_BOTTOM_Y)):
             return True
         else:
             return False
