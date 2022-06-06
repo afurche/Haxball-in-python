@@ -15,7 +15,7 @@ class Player:
             if team_player.is_current:
                 team_player.move()
             else:
-                team_player.move_automatic(self._game_ball)
+                team_player.advanced_move_automatic(self._game_ball)
 
     @property
     def team(self):
@@ -30,12 +30,22 @@ class Player:
     def get_ball_push_velocities(self):
         return [team_player.ball_push_velocity for team_player in self._team]
 
+    def assign_position_for_off_ball_team_players(self):
+        counter = 0
+        for team_player in self._team:
+            if not team_player.is_current:
+                if counter == 0:
+                    team_player.is_goalkeeper = True
+                else:
+                    team_player.is_goalkeeper = False
+                counter += 1
+
     def change_to_player_closest_to_ball(self, ball_coord: (int, int)) -> None:
         distance_dict = {index: sqrt(abs(ball_coord[0] - player.coord[0]) ** 2 + abs(ball_coord[1] - player.coord[1]) ** 2) for index, player in enumerate(self._team)}
         min_distance_player_index = min(distance_dict, key=lambda k: distance_dict.get(k))
         self.current_player.is_current = False
         self._team[min_distance_player_index].is_current = True
-        self._team[min_distance_player_index].horizontal_strategy = self._team[(min_distance_player_index + 1) % len(self._team)].horizontal_strategy
+        self.assign_position_for_off_ball_team_players()
         print(f"Index: {min_distance_player_index}{self._team[min_distance_player_index].horizontal_strategy},  Index:{(min_distance_player_index + 1) % len(self._team)}{self._team[(min_distance_player_index + 1) % len(self._team)].horizontal_strategy}")
 
     def get_players_coord(self) -> Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]:

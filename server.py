@@ -1,13 +1,14 @@
 import socket
 from _thread import *
-from main import FootballPitch, Player
+from football_pitch import FootballPitch
+from player import Player
 from setup_variables import *
 import pickle
 import pygame
 import os
 
 
-class GameView:
+class GameServer:
     def __init__(self, football_pitch):
         pygame.init()
         self._screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -36,7 +37,7 @@ class GameView:
         self.blit_players()
         pygame.display.update()
 
-    def view_loop(self):
+    def game_server_loop(self):
         while self._view_run:
             self._clock.tick(30)
             self._football_pitch.ball.ball_movement()
@@ -102,18 +103,23 @@ class Server:
                     break
 
             except Exception as e:
+                print("Server error ! :")
                 print(e)
                 break
 
-        print(f"Connection with client{client_id} ended")
+        print(f"Connection with client {client_id} ended")
         self._current_client_id -= 1
         conn.close()
 
-    def view_thread(self):
-        game_view = GameView(self._football_pitch)
-        game_view.view_loop()
+    def game_server_thread(self):
+        game_server = GameServer(self._football_pitch)
+        game_server.game_server_loop()
 
     def ball_handling_thread(self):
+        """
+        Responsible for handling assignment of proper velocities of game ball and for handling scored goals,
+        Ball movement is handled in the game_server_loop method of GameServer
+        """
         while True:
             for index, team_player in enumerate(self._football_pitch.player1.team + self._football_pitch.player2.team):
                 if team_player.circle.colliderect(self._football_pitch.ball.circle):
@@ -133,12 +139,12 @@ class Server:
     def server_run(self):
         self._sock.listen(2)
         print("Server Started")
-        start_new_thread(self.view_thread, ())
+        start_new_thread(self.game_server_thread, ())
         start_new_thread(self.ball_handling_thread, ())
         while True:
-            conn, addr = self._sock.accept()
-            print("Connected to:", addr)
-            start_new_thread(self.client_thread, (conn, self._current_client_id))
+            connection, address = self._sock.accept()
+            print("Connected to:", address)
+            start_new_thread(self.client_thread, (connection, self._current_client_id))
             self._current_client_id += 1
 
 
