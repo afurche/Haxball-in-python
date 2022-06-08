@@ -61,13 +61,13 @@ class Server:
         self._football_pitch = FootballPitch()
 
     def add_goals_if_scored_goal(self):
-        if self._football_pitch.ball.x > 1150 and not self._goal_was_added:
+        if self._football_pitch.ball.x > 1150 and 270 < self._football_pitch.ball.y < 340 and not self._goal_was_added:
             self._football_pitch.player1_score += 1
             self._goal_was_added = True
             self._player1_push_velocities = [[0, 0], [0, 0], [0, 0]]
             self._player2_push_velocities = [[0, 0], [0, 0], [0, 0]]
             self._football_pitch.ball.reset_ball_after_goal()
-        elif self._football_pitch.ball.x < 50 and not self._goal_was_added:
+        elif self._football_pitch.ball.x < 50 and 270 < self._football_pitch.ball.y < 340 and not self._goal_was_added:
             self._football_pitch.player2_score += 1
             self._player1_push_velocities = [[0, 0], [0, 0], [0, 0]]
             self._player2_push_velocities = [[0, 0], [0, 0], [0, 0]]

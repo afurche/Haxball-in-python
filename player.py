@@ -33,6 +33,12 @@ class Player:
     def get_ball_push_velocities(self):
         return [team_player.ball_push_velocity for team_player in self._team]
 
+    def is_goalkeeper_assigned(self):
+        for team_player in self._team:
+            if team_player.is_goalkeeper:
+                return True
+        return False
+
     def assign_position_for_off_ball_team_players(self):
         counter = 0
         for team_player in self._team:
@@ -46,9 +52,11 @@ class Player:
     def change_to_player_closest_to_ball(self, ball_coord: (int, int)) -> None:
         distance_dict = {index: sqrt(abs(ball_coord[0] - player.coord[0]) ** 2 + abs(ball_coord[1] - player.coord[1]) ** 2) for index, player in enumerate(self._team)}
         min_distance_player_index = min(distance_dict, key=lambda k: distance_dict.get(k))
+        tmp_old_current_player = self.current_player
         self.current_player.is_current = False
+        if not self.is_goalkeeper_assigned():
+            tmp_old_current_player.is_goalkeeper = True
         self._team[min_distance_player_index].is_current = True
-        self.assign_position_for_off_ball_team_players()
         print(f"Index: {min_distance_player_index}{self._team[min_distance_player_index].horizontal_strategy},  Index:{(min_distance_player_index + 1) % len(self._team)}{self._team[(min_distance_player_index + 1) % len(self._team)].horizontal_strategy}")
 
     def get_players_coord(self) -> Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]:
@@ -67,3 +75,5 @@ class Player:
     def reset_team_after_goal(self, coord_list):
         for team_player, coord in zip(self._team, coord_list):
             team_player.coord = coord
+            team_player.returned_to_goalkeeper_position = False
+            team_player.returned_to_defender_position = False
