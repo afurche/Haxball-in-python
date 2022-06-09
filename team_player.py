@@ -13,9 +13,8 @@ class TeamPlayer(BallObject):
         self.returned_to_start_position = False
         self._is_moving_automatically = False
         self._horizontal_strategy = True
-        self._touches_ball = False
         self._ball_push_velocity = [0, 0]
-        self._is_goalkeeper = False  # if False is defender of current player
+        self._is_goalkeeper = False  # if False is defender
         self._returned_to_goalkeeper_position = False
         self._returned_to_defender_position = False
 
@@ -165,14 +164,6 @@ class TeamPlayer(BallObject):
     @horizontal_strategy.setter
     def horizontal_strategy(self, strategy):
         self._horizontal_strategy = strategy
-
-    @property
-    def touches_ball(self):
-        return self._touches_ball
-
-    @touches_ball.setter
-    def touches_ball(self, tb):
-        self._touches_ball = tb
 
     @property
     def ball_push_velocity(self):

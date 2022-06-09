@@ -59,6 +59,13 @@ class Player:
         self._team[min_distance_player_index].is_current = True
         print(f"Index: {min_distance_player_index}{self._team[min_distance_player_index].horizontal_strategy},  Index:{(min_distance_player_index + 1) % len(self._team)}{self._team[(min_distance_player_index + 1) % len(self._team)].horizontal_strategy}")
 
+    def change_to_player_touching_ball(self, new_team_player):
+        tmp_old_current_player = self.current_player
+        self.current_player.is_current = False
+        if not self.is_goalkeeper_assigned():
+            tmp_old_current_player.is_goalkeeper = True
+        new_team_player.is_current = True
+
     def get_players_coord(self) -> Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]:
         return tuple(team_player.coord for team_player in self._team)
 
@@ -72,8 +79,22 @@ class Player:
                 team_player.returned_to_start_position = False
                 team_player._horizontal_strategy = not team_player.horizontal_strategy
 
-    def reset_team_after_goal(self, coord_list):
+    def reset_team_after_goal(self, coord_list, player_id):
         for team_player, coord in zip(self._team, coord_list):
-            team_player.coord = coord
+            if team_player.is_goalkeeper and not team_player.is_current:
+                if player_id == 1:
+                    team_player.coord = (BLUE_TEAM_GOALKEEPER_X, PITCH_HEIGHT / 2)
+                else:
+                    team_player.coord = (RED_TEAM_GOALKEEPER_X, PITCH_HEIGHT / 2)
+            elif not team_player.is_goalkeeper and not team_player.is_current:
+                if player_id == 1:
+                    team_player.coord = (BLUE_TEAM_DEFENDER_X, PITCH_HEIGHT / 2)
+                else:
+                    team_player.coord = (RED_TEAM_DEFENDER_X, PITCH_HEIGHT / 2)
+            else:
+                team_player.coord = coord
             team_player.returned_to_goalkeeper_position = False
             team_player.returned_to_defender_position = False
+
+        for team_player in self._team:
+            print(f'{team_player.is_current=}, {team_player.is_goalkeeper=}')

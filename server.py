@@ -126,15 +126,13 @@ class Server:
                     if index < 3:
                         if self._player1_push_velocities[index] != [0, 0]:
                             self._football_pitch.ball.current_velocity = self._player1_push_velocities[index]
-                        else:
-                            self._football_pitch.ball.current_velocity = [(-1) * self._football_pitch.ball.vel_x / 2, (-1) * self._football_pitch.ball.vel_y / 2]
                     else:
-                        if self._player1_push_velocities[index % 3] != [0, 0]:
+                        print(index % 3)
+                        if self._player2_push_velocities[index % 3] != [0, 0]:
                             self._football_pitch.ball.current_velocity = self._player2_push_velocities[index % 3]
-                        else:
-                            self._football_pitch.ball.current_velocity = [(-1) * self._football_pitch.ball.vel_x / 2, (-1) * self._football_pitch.ball.vel_y / 2]
+
             self.add_goals_if_scored_goal()
-            print(f'Ball current velocity: {self._football_pitch.ball.current_velocity}')
+            print('')
 
     def server_run(self):
         self._sock.listen(2)

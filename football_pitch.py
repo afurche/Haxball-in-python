@@ -93,11 +93,12 @@ class FootballPitch:
 
         for team_player in player_tmp.team:
             if team_player.circle.colliderect(self._ball.circle):
-                team_player.touches_ball = True
-            else:
-                team_player.touches_ball = False
+                if not team_player.is_current:
+                    player_tmp.change_to_player_touching_ball(team_player)
 
     def reset_pitch_after_goal(self):
-        self._player1.reset_team_after_goal(RED_TEAM_START_POSITIONS)
-        self._player2.reset_team_after_goal(BLUE_TEAM_START_POSITIONS)
+        if self._player_id == 1:
+            self._player1.reset_team_after_goal(RED_TEAM_START_POSITIONS, 1)
+        else:
+            self._player2.reset_team_after_goal(BLUE_TEAM_START_POSITIONS, 2)
         self._ball.reset_ball_after_goal()
