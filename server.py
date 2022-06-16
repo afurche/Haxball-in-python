@@ -38,6 +38,10 @@ class GameServer:
         pygame.display.update()
 
     def game_server_loop(self):
+        """
+        Handles the loop of the server view of the game also handles ball movement in the game
+        :return:
+        """
         while self._view_run:
             self._clock.tick(30)
             self._football_pitch.ball.ball_movement()
@@ -47,7 +51,7 @@ class GameServer:
 
 class Server:
     def __init__(self):
-        self._server = "192.168.0.123"
+        self._server = "172.16.128.171"
         self._port = 5556
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._current_client_id = 0
@@ -77,11 +81,20 @@ class Server:
             self._goal_was_added = False
 
     def client_thread(self, conn, client_id):
+        """
+        Thread function used for handling a client on a server, server receives and sends data to client
+
+        """
         self._football_pitch.player_id = client_id + 1
         conn.send(pickle.dumps(self._football_pitch))
         while True:
             try:
                 data = pickle.loads(conn.recv(512))
+
+                if not data:
+                    print(f"Client{client_id} disconnected with server !")
+                    break
+
                 if client_id == 0:
                     self._football_pitch.player1.set_players_coord(data[0])
 
@@ -98,13 +111,8 @@ class Server:
                     message = (self._football_pitch.player1.get_players_coord(), self._football_pitch.ball.coord, self._football_pitch.scores)
                     conn.sendall(pickle.dumps(message))
 
-                if not data:
-                    print(f"Client{client_id} disconnected with server")
-                    break
-
             except Exception as e:
-                print("Server error ! :")
-                print(e)
+                print(f"Server error ! :, {e}")
                 break
 
         print(f"Connection with client {client_id} ended")
@@ -119,6 +127,7 @@ class Server:
         """
         Responsible for handling assignment of proper velocities of game ball and for handling scored goals,
         Ball movement is handled in the game_server_loop method of GameServer
+        If the ball has a collision with a team player its velocity is changed to proper value received from client.
         """
         while True:
             for index, team_player in enumerate(self._football_pitch.player1.team + self._football_pitch.player2.team):
@@ -135,6 +144,9 @@ class Server:
             print('')
 
     def server_run(self):
+        """
+        Main loop of server
+        """
         self._sock.listen(2)
         print("Server Started")
         start_new_thread(self.game_server_thread, ())

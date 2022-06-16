@@ -19,6 +19,10 @@ class TeamPlayer(BallObject):
         self._returned_to_defender_position = False
 
     def move(self):
+        """
+        Handles movement of current team_player, can be moved using WSAD keys or arrows
+        :return:
+        """
         keys = pygame.key.get_pressed()
 
         if (keys[pygame.K_a] or keys[pygame.K_LEFT]) and self._x > 30:
@@ -169,79 +173,11 @@ class TeamPlayer(BallObject):
     def ball_push_velocity(self):
         return self._ball_push_velocity
 
-    def move_automatic(self, ball):
-        if self._horizontal_strategy:
-            if self.returned_to_start_position:
-                if self.x <= self._start_x + 150 and not self._move_backward:
-                    self.x += 5
-                    if self._touches_ball:
-                        if self.x < ball.x:
-                            ball.current_velocity = [10, 0]
-                elif self.x >= self._start_x + 150 and not self._move_backward:
-                    self._move_backward = True
-                elif self.x > self._start_x - 150 and self._move_backward:
-                    self.x -= 5
-                    if self._touches_ball:
-                        if self.x > ball.x:
-                            ball.current_velocity = [-10, 0]
-                elif self.x <= self._start_x - 150 and self._move_backward:
-                    self._move_backward = False
-            else:
-                if self.y < self._start_y - 5:
-                    self.y += 5
-                    if self._touches_ball:
-                        ball.current_velocity = [0, 5]
-                elif self.y > self._start_y + 5:
-                    self.y -= 5
-                    if self._touches_ball:
-                        ball.current_velocity = [0, -5]
-                else:
-                    if self.x < self._start_x - 5:
-                        self.x += 5
-                        if self._touches_ball:
-                            ball.current_velocity = [5, 0]
-                    elif self.x > self._start_x + 5:
-                        self.x -= 5
-                        if self._touches_ball:
-                            ball.current_velocity = [-5, 0]
-                    else:
-                        self.returned_to_start_position = True
-        else:
-            if self.returned_to_start_position:
-                if self.y <= self._start_y + 100 and not self._move_backward:
-                    self.y += 5
-                    if self._touches_ball:
-                        ball.current_velocity = [0, 10]
-                elif self.y >= self._start_y + 100 and not self._move_backward:
-                    self._move_backward = True
-                elif self.y > self._start_y - 100 and self._move_backward:
-                    self.y -= 5
-                    if self._touches_ball:
-                        ball.current_velocity = [0, -10]
-                elif self.y <= self._start_y - 100 and self._move_backward:
-                    self._move_backward = False
-            else:
-                if self.y < self._start_y - 5:
-                    self.y += 5
-                    if self._touches_ball:
-                        ball.current_velocity = [0, 5]
-                elif self.y > self._start_y + 5:
-                    self.y -= 5
-                    if self._touches_ball:
-                        ball.current_velocity = [0, -5]
-                else:
-                    if self.x < self._start_x - 5:
-                        self.x += 5
-                        if self._touches_ball:
-                            ball.current_velocity = [5, 0]
-                    elif self.x > self._start_x + 5:
-                        self.x -= 5
-                        if self._touches_ball:
-                            ball.current_velocity = [-5, 0]
-                    else:
-                        self.returned_to_start_position = True
-
     def advanced_move_automatic(self, player_goal_x_coord, player_defender_x_coord, ball):
+        """
+        Implements movement of bots, bot can be either a defender which stands in the middle of the player's half and
+        follows the ball in the y axis, or can be a goalkeeper which stands near the player's goal and moves automatically up and down
+        """
         if self._is_goalkeeper:
             if self._returned_to_goalkeeper_position:
                 if self.y > GOAL_UP_Y - PLAYER_BALL_SIZE - 20 and not self._move_backward:

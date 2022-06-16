@@ -86,6 +86,12 @@ class Game:
             self._football_pitch.player2.move_footballer(2)
 
     def communication_thread(self):
+        """
+        Separate thread for handling communication of the client with server.
+        Communication works in a way that :]
+        Server sends a tuple containing coordinates of the footballers of the opponent, coordinates of ball and game score
+        Client sends coordinates of self footballers and the list with velocities that should be assinged to ball during collision
+        """
         self._network.connect_to_server()
         self._football_pitch = self._network.football_pitch
         while self._game_run:
@@ -107,6 +113,9 @@ class Game:
                     self._football_pitch.reset_pitch_after_goal()
 
     def game_loop(self):
+        """
+        Main loop of the game on client side
+        """
         start_new_thread(self.communication_thread, ())
         while self._game_run:
             self._clock.tick(30)
